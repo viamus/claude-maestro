@@ -228,14 +228,59 @@ If a security issue is discovered:
 
 ---
 
+## Automated Security Scanning
+
+### GitHub Actions - Security Audit Workflow
+
+**Location**: `.github/workflows/security.yml`
+
+**Automated Checks (Every Push/PR + Daily):**
+
+1. ✅ **Dependency Audit**
+   - `npm audit` for known vulnerabilities
+   - Production vs dev dependency separation
+   - Blocks on high-severity issues
+
+2. ✅ **CodeQL Analysis**
+   - Static code security analysis
+   - JavaScript/TypeScript scanning
+   - Uploads to GitHub Security tab
+
+3. ✅ **Electron Security Validation**
+   - Verifies `contextIsolation: true`
+   - Verifies `nodeIntegration: false`
+   - Verifies `sandbox: true`
+   - Verifies `webSecurity: true`
+   - **Auto-blocks** if any setting missing
+
+4. ✅ **Renderer Node.js Check**
+   - Scans for `fs`, `path`, `child_process`, etc.
+   - **Auto-blocks** if Node.js imports found
+
+5. ✅ **CSP Validation**
+   - Checks Content Security Policy
+   - Blocks `'unsafe-eval'` and `'unsafe-inline'` scripts
+
+6. ✅ **License Compliance**
+   - Validates dependencies licenses
+   - Blocks GPL-2.0, GPL-3.0
+   - Allows: MIT, Apache-2.0, BSD, ISC
+
+**Daily Scheduled Scan**: Midnight UTC
+
+**See**: `.wiki/ci-cd.md` for complete CI/CD documentation
+
+---
+
 ## References
 
 - [Electron Security Guidelines](https://www.electronjs.org/docs/latest/tutorial/security)
 - [OWASP Electron Security](https://owasp.org/www-community/Electron_Security)
 - [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
+- [GitHub Actions Security](https://docs.github.com/en/actions/security-guides)
 
 ---
 
 **Last Full Audit**: 2024-12-24
-**Next Scheduled Audit**: 2025-01-24
-**Audited By**: Claude (Initial Bootstrap)
+**Next Scheduled Audit**: Automated daily via GitHub Actions
+**Audited By**: Claude (Initial Bootstrap) + CI/CD Pipeline

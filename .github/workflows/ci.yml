@@ -1,0 +1,128 @@
+name: CI - Build & Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run type checking
+        run: npx tsc --noEmit -p tsconfig.main.json && npx tsc --noEmit -p tsconfig.preload.json && npx tsc --noEmit -p tsconfig.renderer.json
+
+      - name: Run unit tests
+        run: npm run test
+
+      - name: Generate coverage report
+        run: npm run test:coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/coverage-final.json
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+  build:
+    name: Build Application
+    runs-on: windows-latest
+    needs: test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build main process
+        run: npm run build:main
+
+      - name: Build preload
+        run: npm run build:preload
+
+      - name: Build renderer
+        run: npm run build:renderer
+
+      - name: Verify build artifacts
+        shell: pwsh
+        run: |
+          if (!(Test-Path "dist/main/main.js")) {
+            Write-Error "Main build failed - dist/main/main.js not found"
+            exit 1
+          }
+          if (!(Test-Path "dist/preload/preload.js")) {
+            Write-Error "Preload build failed - dist/preload/preload.js not found"
+            exit 1
+          }
+          if (!(Test-Path "dist/renderer/index.html")) {
+            Write-Error "Renderer build failed - dist/renderer/index.html not found"
+            exit 1
+          }
+          Write-Host "✅ All build artifacts verified successfully"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: dist/
+          retention-days: 7
+
+  package:
+    name: Package Installer
+    runs-on: windows-latest
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Package installer
+        run: npm run package:dir
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: release/
+          retention-days: 30

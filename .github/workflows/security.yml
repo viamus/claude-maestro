@@ -1,0 +1,267 @@
+name: Security Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run security audit daily at 00:00 UTC
+    - cron: '0 0 * * *'
+
+jobs:
+  dependency-audit:
+    name: Dependency Vulnerability Scan
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Run npm audit
+        run: |
+          npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Run npm audit (production only)
+        run: |
+          npm audit --production --audit-level=high
+
+      - name: Check for outdated packages
+        run: npm outdated || exit 0
+
+  codeql-analysis:
+    name: CodeQL Security Scan
+    runs-on: windows-latest
+    permissions:
+      security-events: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript, typescript
+          queries: security-extended
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:typescript"
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: windows-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
+          deny-licenses: GPL-2.0, GPL-3.0
+
+  electron-security:
+    name: Electron Security Validation
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate Electron Security Settings
+        shell: pwsh
+        run: |
+          Write-Host "🔍 Validating Electron Security Configuration..."
+
+          # Check main.ts for security settings
+          $mainContent = Get-Content "src/main/main.ts" -Raw
+
+          $securityChecks = @{
+            "contextIsolation: true" = $mainContent -match "contextIsolation:\s*true"
+            "nodeIntegration: false" = $mainContent -match "nodeIntegration:\s*false"
+            "sandbox: true" = $mainContent -match "sandbox:\s*true"
+            "webSecurity: true" = $mainContent -match "webSecurity:\s*true"
+          }
+
+          $failed = $false
+          foreach ($check in $securityChecks.GetEnumerator()) {
+            if ($check.Value) {
+              Write-Host "✅ $($check.Key)" -ForegroundColor Green
+            } else {
+              Write-Host "❌ $($check.Key) - NOT FOUND OR DISABLED" -ForegroundColor Red
+              $failed = $true
+            }
+          }
+
+          if ($failed) {
+            Write-Error "Security validation failed - critical Electron settings missing or disabled"
+            exit 1
+          }
+
+          Write-Host "`n✅ All Electron security settings validated successfully" -ForegroundColor Green
+
+      - name: Check for Node.js in Renderer
+        shell: pwsh
+        run: |
+          Write-Host "🔍 Checking for Node.js API usage in renderer..."
+
+          $rendererFiles = Get-ChildItem -Path "src/renderer" -Recurse -Include *.ts,*.tsx
+          $violations = @()
+
+          $forbiddenModules = @('fs', 'path', 'child_process', 'os', 'crypto', 'net', 'http', 'https')
+
+          foreach ($file in $rendererFiles) {
+            $content = Get-Content $file.FullName -Raw
+            foreach ($module in $forbiddenModules) {
+              if ($content -match "require\([`"']$module[`"']\)|import.*from\s+[`"']$module[`"']") {
+                $violations += "❌ $($file.Name): Imports Node.js module '$module'"
+              }
+            }
+          }
+
+          if ($violations.Count -gt 0) {
+            Write-Host "Security violations found:" -ForegroundColor Red
+            $violations | ForEach-Object { Write-Host $_ -ForegroundColor Red }
+            Write-Error "Renderer process must not import Node.js modules directly"
+            exit 1
+          }
+
+          Write-Host "✅ No Node.js API usage found in renderer" -ForegroundColor Green
+
+      - name: Validate CSP Configuration
+        shell: pwsh
+        run: |
+          Write-Host "🔍 Validating Content Security Policy..."
+
+          $htmlContent = Get-Content "src/renderer/index.html" -Raw
+
+          if ($htmlContent -match 'Content-Security-Policy') {
+            Write-Host "✅ CSP meta tag found" -ForegroundColor Green
+
+            # Check for unsafe practices
+            if ($htmlContent -match "'unsafe-eval'") {
+              Write-Error "❌ CSP allows 'unsafe-eval' - BLOCKED"
+              exit 1
+            }
+
+            if ($htmlContent -match "script-src.*'unsafe-inline'") {
+              Write-Error "❌ CSP allows 'unsafe-inline' for scripts - BLOCKED"
+              exit 1
+            }
+
+            Write-Host "✅ CSP configuration is secure" -ForegroundColor Green
+          } else {
+            Write-Error "❌ Content Security Policy not found in index.html"
+            exit 1
+          }
+
+      - name: Check for Exposed Secrets
+        shell: pwsh
+        run: |
+          Write-Host "🔍 Checking for exposed secrets..."
+
+          $patterns = @(
+            'password\s*=\s*["\'][^"\']+["\']',
+            'api[_-]?key\s*=\s*["\'][^"\']+["\']',
+            'secret\s*=\s*["\'][^"\']+["\']',
+            'token\s*=\s*["\'][^"\']+["\']'
+          )
+
+          $violations = @()
+          $files = Get-ChildItem -Path "src" -Recurse -Include *.ts,*.tsx
+
+          foreach ($file in $files) {
+            $content = Get-Content $file.FullName -Raw
+            foreach ($pattern in $patterns) {
+              if ($content -match $pattern) {
+                $violations += "⚠️ Potential secret in $($file.Name)"
+              }
+            }
+          }
+
+          if ($violations.Count -gt 0) {
+            Write-Host "Potential secrets found (review required):" -ForegroundColor Yellow
+            $violations | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
+          } else {
+            Write-Host "✅ No obvious secrets found" -ForegroundColor Green
+          }
+
+  license-compliance:
+    name: License Compliance Check
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check licenses
+        run: npx license-checker --summary --production --onlyAllow "MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;0BSD"
+
+  security-summary:
+    name: Security Summary
+    runs-on: windows-latest
+    needs: [dependency-audit, electron-security, license-compliance]
+    if: always()
+
+    steps:
+      - name: Security Status
+        shell: pwsh
+        run: |
+          Write-Host "`n========================================" -ForegroundColor Cyan
+          Write-Host "   SECURITY AUDIT SUMMARY" -ForegroundColor Cyan
+          Write-Host "========================================`n" -ForegroundColor Cyan
+
+          $jobs = @{
+            "Dependency Audit" = "${{ needs.dependency-audit.result }}"
+            "Electron Security" = "${{ needs.electron-security.result }}"
+            "License Compliance" = "${{ needs.license-compliance.result }}"
+          }
+
+          $failed = $false
+          foreach ($job in $jobs.GetEnumerator()) {
+            if ($job.Value -eq "success") {
+              Write-Host "✅ $($job.Key): PASSED" -ForegroundColor Green
+            } else {
+              Write-Host "❌ $($job.Key): FAILED" -ForegroundColor Red
+              $failed = $true
+            }
+          }
+
+          Write-Host "`n========================================`n" -ForegroundColor Cyan
+
+          if ($failed) {
+            Write-Error "Security audit failed - review required"
+            exit 1
+          } else {
+            Write-Host "✅ ALL SECURITY CHECKS PASSED" -ForegroundColor Green
+          }
