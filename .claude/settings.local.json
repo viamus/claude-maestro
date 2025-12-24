@@ -3,7 +3,8 @@
     "allow": [
       "Bash(dir /S /B)",
       "Bash(findstr:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nchore: initialize claude-maestro electron project\n\nComplete production-ready Electron + TypeScript + Vite bootstrap:\n\nArchitecture:\n- Main process with logger and settings services\n- Secure preload with contextBridge (no Node.js exposure)\n- React renderer with type-safe IPC\n- Shared contracts for full type safety\n\nSecurity:\n- contextIsolation: true\n- nodeIntegration: false\n- sandbox: true\n- Content Security Policy configured\n- All security measures documented\n\nInfrastructure:\n- Vite dev server with HMR\n- TypeScript strict mode (all processes)\n- ESLint + Prettier configured\n- electron-builder for Windows installer\n- Development script with auto-restart\n\nDocumentation:\n- Complete architecture guide (.wiki/architecture.md)\n- Security checklist (.wiki/security-checklist.md)\n- Code examples and patterns (.wiki/examples.md)\n- Quick start guide (.wiki/quickstart.md)\n- Command reference (.wiki/commands.md)\n\nClaude Code:\n- System prompt with architectural guidelines\n- Commit validation command with security gates\n- Proactive documentation requirements\n\nDemo Features:\n- IPC ping/pong test\n- Settings persistence (theme selection)\n- Version information display\n- Error handling examples\n\nReady for feature development.\nEOF\n)\")"
     ]
   }
 }

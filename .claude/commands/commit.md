@@ -82,7 +82,41 @@ For EACH modified file, identify:
 
 ---
 
-### Gate 4: Documentation
+### Gate 4: Unit Tests
+
+**BLOCK if new code without tests:**
+
+**All new code MUST have unit tests:**
+- New service → `.test.ts` file with ≥80% coverage
+- New IPC handler → Test all channels and error cases
+- New React component → `.test.tsx` with user interactions
+- New utility function → Test all branches
+
+**Required test validation:**
+
+```bash
+# Run tests before commit
+npm run test
+```
+
+**BLOCK if:**
+- New `.ts` file without corresponding `.test.ts`
+- New `.tsx` file without corresponding `.test.tsx`
+- Tests fail or error
+- Coverage <80% for new files
+- Critical path (IPC, security) not 100% covered
+
+**Test file must be in same directory as source:**
+```
+src/main/services/new-service.ts
+src/main/services/new-service.test.ts  ← REQUIRED
+```
+
+**If blocked**: Write tests first, verify they pass, then commit.
+
+---
+
+### Gate 5: Documentation
 
 **BLOCK if structural change without docs:**
 
@@ -98,7 +132,7 @@ For EACH modified file, identify:
 
 ---
 
-### Gate 5: Code Quality
+### Gate 6: Code Quality
 
 **BLOCK if:**
 - Obvious dead code introduced
@@ -265,6 +299,8 @@ Use this for each commit request:
 □ Security validated (contextIsolation, nodeIntegration, etc.)
 □ Architecture separation verified (main/preload/renderer/shared)
 □ IPC contracts typed and registered
+□ Unit tests written and passing (npm run test)
+□ Test coverage adequate (≥80% for new files)
 □ Documentation updated (if structural change)
 □ Code quality acceptable
 □ Commit message prepared

@@ -137,15 +137,19 @@ Claude **MUST** create or update `.wiki/` files whenever:
 - **Logging**: Use logger service for all important operations
 - **Security**: Never expose Node.js APIs directly to renderer
 - **Validation**: Validate all IPC inputs in handlers
+- **Testing**: Unit tests REQUIRED for all new code (see Testing Requirements below)
 
 ### Development Workflow
 
 ```bash
-npm run dev      # Start development mode
-npm run build    # Build for production
-npm run package  # Create Windows installer
-npm run lint     # Check code quality
-npm run format   # Format code
+npm run dev           # Start development mode
+npm run build         # Build for production
+npm run test          # Run all tests
+npm run test:watch    # Run tests in watch mode
+npm run test:coverage # Generate coverage report
+npm run package       # Create Windows installer
+npm run lint          # Check code quality
+npm run format        # Format code
 ```
 
 ## Communication Style
@@ -225,6 +229,123 @@ When adding ANY new IPC endpoint or exposed API:
 1. Validate inputs in main process
 2. Document security implications
 3. Update security checklist if needed
+
+---
+
+### 3. Testing Requirements (MANDATORY)
+
+Claude **MUST** write unit tests for ALL new code:
+
+#### What Requires Tests
+
+**Every new component MUST have tests:**
+- ✅ Main process services → `.test.ts` file in same directory
+- ✅ IPC handlers → Test all channels and error cases
+- ✅ React components → `.test.tsx` with user interactions
+- ✅ Utility functions → Test all branches and edge cases
+- ✅ Type validators → Test invalid inputs
+
+**Test Coverage Requirements:**
+- New files: ≥80% coverage
+- Critical paths (IPC, security): 100% coverage
+- Edge cases and error handling: Required
+
+#### Test Location Convention
+
+```
+src/
+├── main/
+│   ├── services/
+│   │   ├── logger.ts
+│   │   ├── logger.test.ts          ← Test file
+│   │   ├── settings-manager.ts
+│   │   └── settings-manager.test.ts
+│   ├── ipc-handlers.ts
+│   └── ipc-handlers.test.ts
+├── renderer/
+│   └── src/
+│       ├── App.tsx
+│       ├── App.test.tsx             ← Test file
+│       └── components/
+│           ├── MyComponent.tsx
+│           └── MyComponent.test.tsx
+```
+
+#### Test Structure (REQUIRED)
+
+```typescript
+describe('ComponentName', () => {
+  // Setup
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('FeatureName', () => {
+    it('should do expected behavior', () => {
+      // Arrange
+      // Act
+      // Assert
+    });
+
+    it('should handle error case', () => {
+      // Test error scenarios
+    });
+  });
+});
+```
+
+#### What to Test
+
+**Main Process:**
+- Service initialization
+- Method inputs/outputs
+- Error handling
+- File I/O operations
+- IPC handler responses
+
+**Renderer:**
+- Component renders correctly
+- User interactions (clicks, inputs)
+- IPC calls triggered
+- State updates
+- Error states displayed
+
+**Shared:**
+- Type validations
+- Constants correctness
+- Contract enforcement
+
+#### Testing Commands
+
+```bash
+npm run test          # Run all tests once
+npm run test:watch    # Watch mode (development)
+npm run test:coverage # Generate coverage report
+npm run test:ui       # Visual test UI
+```
+
+#### When Tests Can Be Skipped
+
+**NEVER.** Tests are not optional.
+
+If unsure how to test something:
+1. Check existing test files for patterns
+2. See `.wiki/testing-guide.md`
+3. Ask user for clarification
+
+**Tests must pass before commit.**
+
+#### Test Validation in Commits
+
+Before creating any commit, Claude MUST:
+1. Run `npm run test`
+2. Verify all tests pass
+3. Check coverage for new files
+4. BLOCK commit if tests fail
+
+**No untested code enters the repository.**
+
+---
 
 ## Build & Deployment
 
