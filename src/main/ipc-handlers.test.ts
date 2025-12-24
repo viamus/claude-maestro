@@ -90,7 +90,7 @@ describe('IPC Handlers', () => {
 
   describe('Ping Handler', () => {
     it('should return pong on ping', async () => {
-      let pingHandler: Function | null = null;
+      let pingHandler: ((...args: any[]) => any) | null = null;
 
       vi.mocked(ipcMain.handle).mockImplementation((channel, handler) => {
         if (channel === IPC_CHANNELS.PING) {
@@ -114,7 +114,7 @@ describe('IPC Handlers', () => {
 
   describe('Settings Handlers', () => {
     it('should get a single setting', async () => {
-      let settingsGetHandler: Function | null = null;
+      let settingsGetHandler: ((...args: any[]) => any) | null = null;
 
       vi.mocked(ipcMain.handle).mockImplementation((channel, handler) => {
         if (channel === IPC_CHANNELS.SETTINGS_GET) {
@@ -136,7 +136,7 @@ describe('IPC Handlers', () => {
     });
 
     it('should set a setting', async () => {
-      let settingsSetHandler: Function | null = null;
+      let settingsSetHandler: ((...args: any[]) => any) | null = null;
 
       vi.mocked(ipcMain.handle).mockImplementation((channel, handler) => {
         if (channel === IPC_CHANNELS.SETTINGS_SET) {
@@ -159,7 +159,7 @@ describe('IPC Handlers', () => {
     });
 
     it('should get all settings', async () => {
-      let settingsGetAllHandler: Function | null = null;
+      let settingsGetAllHandler: ((...args: any[]) => any) | null = null;
 
       vi.mocked(ipcMain.handle).mockImplementation((channel, handler) => {
         if (channel === IPC_CHANNELS.SETTINGS_GET_ALL) {
@@ -187,7 +187,7 @@ describe('IPC Handlers', () => {
 
   describe('App Version Handler', () => {
     it('should return app version info', async () => {
-      let appVersionHandler: Function | null = null;
+      let appVersionHandler: ((...args: any[]) => any) | null = null;
 
       vi.mocked(ipcMain.handle).mockImplementation((channel, handler) => {
         if (channel === IPC_CHANNELS.APP_VERSION) {
@@ -212,7 +212,7 @@ describe('IPC Handlers', () => {
 
   describe('Error Handling', () => {
     it('should return error response when handler throws', async () => {
-      let settingsGetHandler: Function | null = null;
+      let settingsGetHandler: ((...args: any[]) => any) | null = null;
 
       vi.mocked(ipcMain.handle).mockImplementation((channel, handler) => {
         if (channel === IPC_CHANNELS.SETTINGS_GET) {
