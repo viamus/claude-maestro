@@ -19,7 +19,7 @@ function createSuccessResponse<T>(data: T): IPCResponse<T> {
 /**
  * Helper to create error response
  */
-function createErrorResponse(error: string): IPCResponse {
+function createErrorResponse<T = never>(error: string): IPCResponse<T> {
   return { success: false, error };
 }
 
@@ -36,7 +36,7 @@ export function registerIPCHandlers(): void {
       return createSuccessResponse('pong');
     } catch (error) {
       logger.error('Error in ping handler', error);
-      return createErrorResponse(
+      return createErrorResponse<string>(
         error instanceof Error ? error.message : 'Unknown error'
       );
     }
@@ -55,7 +55,7 @@ export function registerIPCHandlers(): void {
         return createSuccessResponse(value);
       } catch (error) {
         logger.error(`Error getting setting: ${key}`, error);
-        return createErrorResponse(
+        return createErrorResponse<AppSettings[SettingKey]>(
           error instanceof Error ? error.message : 'Unknown error'
         );
       }
@@ -75,7 +75,7 @@ export function registerIPCHandlers(): void {
         return createSuccessResponse(undefined);
       } catch (error) {
         logger.error(`Error setting ${payload.key}`, error);
-        return createErrorResponse(
+        return createErrorResponse<void>(
           error instanceof Error ? error.message : 'Unknown error'
         );
       }
@@ -92,7 +92,7 @@ export function registerIPCHandlers(): void {
         return createSuccessResponse(settings);
       } catch (error) {
         logger.error('Error getting all settings', error);
-        return createErrorResponse(
+        return createErrorResponse<AppSettings>(
           error instanceof Error ? error.message : 'Unknown error'
         );
       }
@@ -113,7 +113,7 @@ export function registerIPCHandlers(): void {
         return createSuccessResponse(version);
       } catch (error) {
         logger.error('Error getting app version', error);
-        return createErrorResponse(
+        return createErrorResponse<AppVersion>(
           error instanceof Error ? error.message : 'Unknown error'
         );
       }
@@ -128,7 +128,7 @@ export function registerIPCHandlers(): void {
       return createSuccessResponse(undefined);
     } catch (error) {
       logger.error('Error quitting app', error);
-      return createErrorResponse(
+      return createErrorResponse<void>(
         error instanceof Error ? error.message : 'Unknown error'
       );
     }

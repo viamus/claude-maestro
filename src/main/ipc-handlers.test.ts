@@ -4,7 +4,6 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { ipcMain } from 'electron';
-import type { IPCResponse } from '@shared/types';
 import { IPC_CHANNELS } from '@shared/ipc-channels';
 
 // Mock dependencies
@@ -102,13 +101,11 @@ describe('IPC Handlers', () => {
 
       expect(pingHandler).not.toBeNull();
 
-      if (pingHandler) {
-        const result = await pingHandler({}, undefined);
-        expect(result).toEqual({
-          success: true,
-          data: 'pong',
-        });
-      }
+      const result = await pingHandler!({}, undefined);
+      expect(result).toEqual({
+        success: true,
+        data: 'pong',
+      });
     });
   });
 
@@ -124,15 +121,13 @@ describe('IPC Handlers', () => {
 
       registerIPCHandlers();
 
-      if (settingsGetHandler) {
-        const result = await settingsGetHandler({}, 'theme');
+      const result = await settingsGetHandler!({}, 'theme');
 
-        expect(settingsManager.get).toHaveBeenCalledWith('theme');
-        expect(result).toEqual({
-          success: true,
-          data: 'system',
-        });
-      }
+      expect(settingsManager.get).toHaveBeenCalledWith('theme');
+      expect(result).toEqual({
+        success: true,
+        data: 'system',
+      });
     });
 
     it('should set a setting', async () => {
@@ -146,16 +141,14 @@ describe('IPC Handlers', () => {
 
       registerIPCHandlers();
 
-      if (settingsSetHandler) {
-        const payload = { key: 'theme', value: 'dark' };
-        const result = await settingsSetHandler({}, payload);
+      const payload = { key: 'theme', value: 'dark' };
+      const result = await settingsSetHandler!({}, payload);
 
-        expect(settingsManager.set).toHaveBeenCalledWith('theme', 'dark');
-        expect(result).toEqual({
-          success: true,
-          data: undefined,
-        });
-      }
+      expect(settingsManager.set).toHaveBeenCalledWith('theme', 'dark');
+      expect(result).toEqual({
+        success: true,
+        data: undefined,
+      });
     });
 
     it('should get all settings', async () => {
@@ -169,19 +162,17 @@ describe('IPC Handlers', () => {
 
       registerIPCHandlers();
 
-      if (settingsGetAllHandler) {
-        const result = await settingsGetAllHandler({}, undefined);
+      const result = await settingsGetAllHandler!({}, undefined);
 
-        expect(settingsManager.getAll).toHaveBeenCalled();
-        expect(result).toEqual({
-          success: true,
-          data: {
-            theme: 'system',
-            language: 'en',
-            windowBounds: { width: 1200, height: 800 },
-          },
-        });
-      }
+      expect(settingsManager.getAll).toHaveBeenCalled();
+      expect(result).toEqual({
+        success: true,
+        data: {
+          theme: 'system',
+          language: 'en',
+          windowBounds: { width: 1200, height: 800 },
+        },
+      });
     });
   });
 
@@ -197,16 +188,14 @@ describe('IPC Handlers', () => {
 
       registerIPCHandlers();
 
-      if (appVersionHandler) {
-        const result = await appVersionHandler({}, undefined);
+      const result = await appVersionHandler!({}, undefined);
 
-        expect(app.getVersion).toHaveBeenCalled();
-        expect(result.success).toBe(true);
-        expect(result.data).toHaveProperty('app');
-        expect(result.data).toHaveProperty('electron');
-        expect(result.data).toHaveProperty('chrome');
-        expect(result.data).toHaveProperty('node');
-      }
+      expect(app.getVersion).toHaveBeenCalled();
+      expect(result.success).toBe(true);
+      expect(result.data).toHaveProperty('app');
+      expect(result.data).toHaveProperty('electron');
+      expect(result.data).toHaveProperty('chrome');
+      expect(result.data).toHaveProperty('node');
     });
   });
 
@@ -226,12 +215,10 @@ describe('IPC Handlers', () => {
 
       registerIPCHandlers();
 
-      if (settingsGetHandler) {
-        const result = await settingsGetHandler({}, 'theme');
+      const result = await settingsGetHandler!({}, 'theme');
 
-        expect(result.success).toBe(false);
-        expect(result.error).toBe('Test error');
-      }
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Test error');
     });
   });
 

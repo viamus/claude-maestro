@@ -4,7 +4,6 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import * as fs from 'fs';
-import * as path from 'path';
 import type { AppSettings } from '@shared/types';
 import { DEFAULT_SETTINGS } from '@shared/types';
 

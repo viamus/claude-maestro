@@ -2,7 +2,7 @@
  * Main App Component
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import type { AppSettings, AppVersion } from '@shared/types';
 import { IPC_CHANNELS } from '@shared/ipc-channels';
 import './styles/App.css';

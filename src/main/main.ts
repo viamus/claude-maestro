@@ -10,7 +10,8 @@ import { settingsManager } from './services/settings-manager';
 import { registerIPCHandlers, unregisterIPCHandlers } from './ipc-handlers';
 
 // Keep a global reference to prevent garbage collection
-let mainWindow: BrowserWindow | null = null;
+// @ts-expect-error - Variable is used to prevent garbage collection
+let _mainWindow: BrowserWindow | null = null;
 
 // Determine if running in development mode
 const isDev = process.env.NODE_ENV === 'development';
@@ -94,13 +95,13 @@ app.whenReady().then(() => {
   registerIPCHandlers();
 
   // Create main window
-  mainWindow = createMainWindow();
+  _mainWindow = createMainWindow();
 
   // macOS: Re-create window when dock icon is clicked
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       logger.info('Re-creating window on activate (macOS)');
-      mainWindow = createMainWindow();
+      _mainWindow = createMainWindow();
     }
   });
 
