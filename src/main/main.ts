@@ -43,7 +43,7 @@ function createMainWindow(): BrowserWindow {
       webSecurity: true,
 
       // Preload script
-      preload: path.join(__dirname, '../preload/preload.js'),
+      preload: path.join(__dirname, '../../preload/preload/preload.js'),
     },
   });
 

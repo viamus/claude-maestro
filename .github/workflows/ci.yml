@@ -88,12 +88,12 @@ jobs:
       - name: Verify build artifacts
         shell: pwsh
         run: |
-          if (!(Test-Path "dist/main/main.js")) {
-            Write-Error "Main build failed - dist/main/main.js not found"
+          if (!(Test-Path "dist/main/main/main.js")) {
+            Write-Error "Main build failed - dist/main/main/main.js not found"
             exit 1
           }
-          if (!(Test-Path "dist/preload/preload.js")) {
-            Write-Error "Preload build failed - dist/preload/preload.js not found"
+          if (!(Test-Path "dist/preload/preload/preload.js")) {
+            Write-Error "Preload build failed - dist/preload/preload/preload.js not found"
             exit 1
           }
           if (!(Test-Path "dist/renderer/index.html")) {

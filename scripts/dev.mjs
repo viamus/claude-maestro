@@ -134,8 +134,8 @@ async function main() {
     console.log('Waiting for compilation to complete...');
     await waitOn({
       resources: [
-        join(rootDir, 'dist/main/main.js'),
-        join(rootDir, 'dist/preload/preload.js'),
+        join(rootDir, 'dist/main/main/main.js'),
+        join(rootDir, 'dist/preload/preload/preload.js'),
       ],
       timeout: 30000,
     });

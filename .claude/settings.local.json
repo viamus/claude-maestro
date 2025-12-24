@@ -9,7 +9,9 @@
       "Bash(git commit:*)",
       "Bash(npm install:*)",
       "Bash(npm run test:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npm run build:*)",
+      "Bash(test:*)"
     ]
   }
 }

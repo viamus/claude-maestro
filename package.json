@@ -2,7 +2,7 @@
   "name": "claude-maestro",
   "version": "1.0.0",
   "description": "Electron desktop application with TypeScript and Vite",
-  "main": "dist/main/main.js",
+  "main": "dist/main/main/main.js",
   "author": "Your Name",
   "license": "MIT",
   "private": true,
