@@ -149,7 +149,7 @@ describe('MainLayout Component', () => {
     });
 
     it('should track current path state', async () => {
-      const { container } = render(
+      render(
         <MainLayout>
           <div>Content</div>
         </MainLayout>

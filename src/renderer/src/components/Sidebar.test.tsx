@@ -283,8 +283,6 @@ describe('Sidebar Component', () => {
     });
 
     it('should have proper title attributes on nav items when collapsed', async () => {
-      const user = userEvent.setup();
-
       // Start collapsed
       window.api.invoke = vi.fn((channel: string, ...args: any[]) => {
         if (channel === IPC_CHANNELS.SETTINGS_GET && args[0] === 'sidebarCollapsed') {
