@@ -43,16 +43,32 @@ function compileTypeScript() {
   console.log('Compiling TypeScript...');
 
   return new Promise((resolve, reject) => {
-    // Compile main and preload in parallel
-    const mainCompile = spawn('npx', ['tsc', '-p', 'tsconfig.main.json', '--watch'], {
-      shell: true,
-      stdio: 'inherit',
-      cwd: rootDir,
-    });
+    // Compile main and preload in parallel with tsc-alias
+    const mainCompile = spawn(
+      'npx',
+      [
+        'tsc-watch',
+        '-p',
+        'tsconfig.main.json',
+        '--onSuccess',
+        'tsc-alias -p tsconfig.main.json',
+      ],
+      {
+        shell: true,
+        stdio: 'inherit',
+        cwd: rootDir,
+      }
+    );
 
     const preloadCompile = spawn(
       'npx',
-      ['tsc', '-p', 'tsconfig.preload.json', '--watch'],
+      [
+        'tsc-watch',
+        '-p',
+        'tsconfig.preload.json',
+        '--onSuccess',
+        'tsc-alias -p tsconfig.preload.json',
+      ],
       {
         shell: true,
         stdio: 'inherit',
@@ -64,7 +80,7 @@ function compileTypeScript() {
     setTimeout(() => {
       console.log('TypeScript compilation started in watch mode');
       resolve();
-    }, 3000);
+    }, 5000);
 
     mainCompile.on('error', reject);
     preloadCompile.on('error', reject);
