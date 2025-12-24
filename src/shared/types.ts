@@ -15,6 +15,7 @@ export interface AppSettings {
     y?: number;
   };
   lastOpened?: string;
+  sidebarCollapsed?: boolean;
 }
 
 /**
@@ -27,6 +28,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     width: 1200,
     height: 800,
   },
+  sidebarCollapsed: false,
 };
 
 /**
@@ -51,4 +53,21 @@ export interface AppVersion {
   electron: string;
   chrome: string;
   node: string;
+}
+
+/**
+ * Navigation item definition
+ */
+export interface NavItem {
+  id: string;
+  label: string;
+  icon: string;
+  path: string;
+}
+
+/**
+ * UI Layout preferences
+ */
+export interface LayoutPreferences {
+  sidebarCollapsed: boolean;
 }

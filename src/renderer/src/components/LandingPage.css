@@ -1,0 +1,231 @@
+/**
+ * LandingPage Styles
+ */
+
+.landing-page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 48px 24px;
+}
+
+.landing-content {
+  max-width: 1000px;
+  width: 100%;
+}
+
+/* Welcome Section */
+.welcome-section {
+  margin-bottom: 64px;
+  text-align: center;
+}
+
+.welcome-title {
+  font-size: 36px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+  color: #212529;
+}
+
+.welcome-subtitle {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #6c757d;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Section Styles */
+.section-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 24px 0;
+  color: #212529;
+}
+
+/* Changelog Section */
+.changelog-section {
+  margin-bottom: 48px;
+}
+
+.changelog-content {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 32px;
+}
+
+.changelog-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.version-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  background-color: #495057;
+  color: white;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.release-date {
+  font-size: 14px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.changelog-category {
+  margin-bottom: 28px;
+}
+
+.changelog-category:last-child {
+  margin-bottom: 0;
+}
+
+.changelog-category-title {
+  font-weight: 600;
+  color: #495057;
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-size: 13px;
+}
+
+.changelog-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.changelog-list li {
+  padding: 8px 0 8px 20px;
+  position: relative;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #495057;
+}
+
+.changelog-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #6c757d;
+  font-weight: bold;
+}
+
+/* Actions Section */
+.actions-section {
+  margin-bottom: 64px;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.action-card {
+  padding: 24px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  border: 2px solid #dee2e6;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.action-card:hover {
+  border-color: #495057;
+  box-shadow: 0 2px 8px rgba(73, 80, 87, 0.15);
+}
+
+.action-card-icon {
+  font-size: 36px;
+  display: block;
+  margin-bottom: 12px;
+  color: #6c757d;
+  opacity: 0.9;
+}
+
+.action-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: #212529;
+}
+
+.action-card-description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #6c757d;
+  margin: 0;
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .welcome-title,
+  .section-title,
+  .action-card-title {
+    color: #e0e0e0;
+  }
+
+  .welcome-subtitle,
+  .action-card-description {
+    color: #a0a0a0;
+  }
+
+  .changelog-content {
+    background-color: #2d2d30;
+    border-color: #3e3e42;
+  }
+
+  .changelog-header {
+    border-bottom-color: #3e3e42;
+  }
+
+  .version-badge {
+    background-color: #505050;
+  }
+
+  .release-date {
+    color: #a0a0a0;
+  }
+
+  .changelog-category-title {
+    color: #cccccc;
+  }
+
+  .changelog-list li {
+    color: #cccccc;
+  }
+
+  .changelog-list li::before {
+    color: #808080;
+  }
+
+  .action-card {
+    background-color: #1e1e1e;
+    border-color: #3e3e42;
+  }
+
+  .action-card:hover {
+    border-color: #505050;
+    box-shadow: 0 2px 8px rgba(80, 80, 80, 0.2);
+  }
+
+  .action-card-icon {
+    color: #a0a0a0;
+  }
+}
