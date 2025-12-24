@@ -51,7 +51,7 @@ function compileTypeScript() {
         '-p',
         'tsconfig.main.json',
         '--onSuccess',
-        'tsc-alias -p tsconfig.main.json',
+        'npx tsc-alias -p tsconfig.main.json',
       ],
       {
         shell: true,
@@ -67,7 +67,7 @@ function compileTypeScript() {
         '-p',
         'tsconfig.preload.json',
         '--onSuccess',
-        'tsc-alias -p tsconfig.preload.json',
+        'npx tsc-alias -p tsconfig.preload.json',
       ],
       {
         shell: true,
