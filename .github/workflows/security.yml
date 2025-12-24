@@ -33,7 +33,8 @@ jobs:
           npm audit --omit=dev --audit-level=high
 
       - name: Check for outdated packages
-        run: npm outdated || exit 0
+        run: npm outdated
+        continue-on-error: true
 
   codeql-analysis:
     name: CodeQL Security Scan
@@ -189,10 +190,10 @@ jobs:
           Write-Host "🔍 Checking for exposed secrets..."
 
           $patterns = @(
-            'password\s*=\s*["\'][^"\']+["\']',
-            'api[_-]?key\s*=\s*["\'][^"\']+["\']',
-            'secret\s*=\s*["\'][^"\']+["\']',
-            'token\s*=\s*["\'][^"\']+["\']'
+            'password\s*=\s*["''][^"'']+["'']',
+            'api[_-]?key\s*=\s*["''][^"'']+["'']',
+            'secret\s*=\s*["''][^"'']+["'']',
+            'token\s*=\s*["''][^"'']+["'']'
           )
 
           $violations = @()
