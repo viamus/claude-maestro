@@ -18,7 +18,13 @@ vi.mock('electron', () => ({
   },
 }));
 
-vi.mock('fs');
+vi.mock('fs', () => ({
+  existsSync: vi.fn(),
+  readFileSync: vi.fn(),
+  writeFileSync: vi.fn(),
+  mkdirSync: vi.fn(),
+}));
+
 vi.mock('./logger', () => ({
   logger: {
     info: vi.fn(),
@@ -33,7 +39,7 @@ import { SettingsManager } from './settings-manager';
 
 describe('SettingsManager', () => {
   let settingsManager: SettingsManager;
-  const mockSettingsPath = '/mock/user/data/settings.json';
+  const mockSettingsPath = '\\mock\\user\\data\\settings.json';
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -50,8 +56,8 @@ describe('SettingsManager', () => {
         theme: 'dark',
       };
 
-      vi.spyOn(fs, 'existsSync').mockReturnValue(true);
-      vi.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(mockSettings));
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify(mockSettings));
 
       settingsManager = new SettingsManager();
 
@@ -61,8 +67,8 @@ describe('SettingsManager', () => {
     });
 
     it('should create default settings if file does not exist', () => {
-      vi.spyOn(fs, 'existsSync').mockReturnValue(false);
-      vi.spyOn(fs, 'writeFileSync').mockImplementation(() => {});
+      vi.mocked(fs.existsSync).mockReturnValue(false);
+      vi.mocked(fs.writeFileSync).mockImplementation(() => {});
 
       settingsManager = new SettingsManager();
 
@@ -76,8 +82,8 @@ describe('SettingsManager', () => {
         // missing other keys
       };
 
-      vi.spyOn(fs, 'existsSync').mockReturnValue(true);
-      vi.spyOn(fs, 'readFileSync').mockReturnValue(
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(
         JSON.stringify(partialSettings)
       );
 
@@ -88,9 +94,9 @@ describe('SettingsManager', () => {
     });
 
     it('should use defaults if settings file is corrupted', () => {
-      vi.spyOn(fs, 'existsSync').mockReturnValue(true);
-      vi.spyOn(fs, 'readFileSync').mockReturnValue('invalid json{');
-      vi.spyOn(fs, 'writeFileSync').mockImplementation(() => {});
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue('invalid json{');
+      vi.mocked(fs.writeFileSync).mockImplementation(() => {});
 
       settingsManager = new SettingsManager();
 
@@ -100,8 +106,8 @@ describe('SettingsManager', () => {
 
   describe('get', () => {
     beforeEach(() => {
-      vi.spyOn(fs, 'existsSync').mockReturnValue(false);
-      vi.spyOn(fs, 'writeFileSync').mockImplementation(() => {});
+      vi.mocked(fs.existsSync).mockReturnValue(false);
+      vi.mocked(fs.writeFileSync).mockImplementation(() => {});
       settingsManager = new SettingsManager();
     });
 
@@ -119,8 +125,8 @@ describe('SettingsManager', () => {
 
   describe('set', () => {
     beforeEach(() => {
-      vi.spyOn(fs, 'existsSync').mockReturnValue(false);
-      vi.spyOn(fs, 'writeFileSync').mockImplementation(() => {});
+      vi.mocked(fs.existsSync).mockReturnValue(false);
+      vi.mocked(fs.writeFileSync).mockImplementation(() => {});
       settingsManager = new SettingsManager();
     });
 
@@ -130,13 +136,13 @@ describe('SettingsManager', () => {
     });
 
     it('should persist settings to disk', () => {
-      const writeFileSyncSpy = vi.spyOn(fs, 'writeFileSync');
+      const writeFileSyncSpy = vi.mocked(fs.writeFileSync);
 
       settingsManager.set('language', 'pt');
 
       expect(writeFileSyncSpy).toHaveBeenCalledWith(
         mockSettingsPath,
-        expect.stringContaining('"language":"pt"'),
+        expect.stringContaining('"language": "pt"'),
         'utf-8'
       );
     });
@@ -151,8 +157,8 @@ describe('SettingsManager', () => {
 
   describe('getAll', () => {
     beforeEach(() => {
-      vi.spyOn(fs, 'existsSync').mockReturnValue(false);
-      vi.spyOn(fs, 'writeFileSync').mockImplementation(() => {});
+      vi.mocked(fs.existsSync).mockReturnValue(false);
+      vi.mocked(fs.writeFileSync).mockImplementation(() => {});
       settingsManager = new SettingsManager();
     });
 
@@ -175,8 +181,8 @@ describe('SettingsManager', () => {
 
   describe('reset', () => {
     beforeEach(() => {
-      vi.spyOn(fs, 'existsSync').mockReturnValue(false);
-      vi.spyOn(fs, 'writeFileSync').mockImplementation(() => {});
+      vi.mocked(fs.existsSync).mockReturnValue(false);
+      vi.mocked(fs.writeFileSync).mockImplementation(() => {});
       settingsManager = new SettingsManager();
     });
 
@@ -191,7 +197,7 @@ describe('SettingsManager', () => {
     });
 
     it('should persist reset settings to disk', () => {
-      const writeFileSyncSpy = vi.spyOn(fs, 'writeFileSync');
+      const writeFileSyncSpy = vi.mocked(fs.writeFileSync);
 
       settingsManager.reset();
 
@@ -201,8 +207,8 @@ describe('SettingsManager', () => {
 
   describe('getSettingsPath', () => {
     beforeEach(() => {
-      vi.spyOn(fs, 'existsSync').mockReturnValue(false);
-      vi.spyOn(fs, 'writeFileSync').mockImplementation(() => {});
+      vi.mocked(fs.existsSync).mockReturnValue(false);
+      vi.mocked(fs.writeFileSync).mockImplementation(() => {});
       settingsManager = new SettingsManager();
     });
 

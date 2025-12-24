@@ -19,6 +19,9 @@ export default defineConfig({
     // Setup files
     setupFiles: ['./test/setup.ts'],
 
+    // Test timeout
+    testTimeout: 5000,
+
     // Coverage configuration
     coverage: {
       provider: 'v8',

@@ -172,7 +172,7 @@ jobs:
               exit 1
             }
 
-            if ($htmlContent -match "script-src.*'unsafe-inline'") {
+            if ($htmlContent -match "script-src[^;]*'unsafe-inline'") {
               Write-Error "❌ CSP allows 'unsafe-inline' for scripts - BLOCKED"
               exit 1
             }
@@ -239,7 +239,7 @@ jobs:
         run: npm install
 
       - name: Check licenses
-        run: npx license-checker --summary --production --onlyAllow "MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;0BSD"
+        run: npx license-checker --summary --production --onlyAllow "MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;0BSD" --excludePackages "claude-maestro@1.0.0"
 
   security-summary:
     name: Security Summary

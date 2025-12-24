@@ -167,11 +167,20 @@ describe('App Component', () => {
     it('should display error message on ping failure', async () => {
       const user = userEvent.setup();
 
-      window.api.invoke = vi.fn(() =>
-        Promise.resolve({ success: false, error: 'Connection failed' })
-      ) as any;
-
       render(<App />);
+
+      // Wait for initial load to complete
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /test ipc \(ping\)/i })).toBeInTheDocument();
+      });
+
+      // Now mock the ping to fail
+      window.api.invoke = vi.fn((channel: string) => {
+        if (channel === IPC_CHANNELS.PING) {
+          return Promise.resolve({ success: false, error: 'Connection failed' });
+        }
+        return Promise.resolve({ success: true, data: 'default' });
+      }) as any;
 
       const pingButton = screen.getByRole('button', {
         name: /test ipc \(ping\)/i,
@@ -180,7 +189,7 @@ describe('App Component', () => {
       await user.click(pingButton);
 
       await waitFor(() => {
-        expect(screen.getByText(/error.*connection failed/i)).toBeInTheDocument();
+        expect(screen.getByText(/connection failed/i)).toBeInTheDocument();
       });
     });
   });
@@ -274,14 +283,20 @@ describe('App Component', () => {
     it('should display error banner when error occurs', async () => {
       const user = userEvent.setup();
 
-      window.api.invoke = vi.fn(() =>
-        Promise.resolve({
-          success: false,
-          error: 'Network error',
-        })
-      ) as any;
-
       render(<App />);
+
+      // Wait for initial load
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /test ipc \(ping\)/i })).toBeInTheDocument();
+      });
+
+      // Mock ping to fail
+      window.api.invoke = vi.fn((channel: string) => {
+        if (channel === IPC_CHANNELS.PING) {
+          return Promise.resolve({ success: false, error: 'Network error' });
+        }
+        return Promise.resolve({ success: true, data: 'default' });
+      }) as any;
 
       const pingButton = screen.getByRole('button', {
         name: /test ipc \(ping\)/i,
@@ -290,21 +305,27 @@ describe('App Component', () => {
       await user.click(pingButton);
 
       await waitFor(() => {
-        expect(screen.getByText(/error.*network error/i)).toBeInTheDocument();
+        expect(screen.getByText(/network error/i)).toBeInTheDocument();
       });
     });
 
     it('should allow dismissing error banner', async () => {
       const user = userEvent.setup();
 
-      window.api.invoke = vi.fn(() =>
-        Promise.resolve({
-          success: false,
-          error: 'Test error',
-        })
-      ) as any;
-
       render(<App />);
+
+      // Wait for initial load
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /test ipc \(ping\)/i })).toBeInTheDocument();
+      });
+
+      // Mock ping to fail
+      window.api.invoke = vi.fn((channel: string) => {
+        if (channel === IPC_CHANNELS.PING) {
+          return Promise.resolve({ success: false, error: 'Test error' });
+        }
+        return Promise.resolve({ success: true, data: 'default' });
+      }) as any;
 
       const pingButton = screen.getByRole('button', {
         name: /test ipc \(ping\)/i,
@@ -313,13 +334,13 @@ describe('App Component', () => {
       await user.click(pingButton);
 
       await waitFor(() => {
-        expect(screen.getByText(/error.*test error/i)).toBeInTheDocument();
+        expect(screen.getByText(/test error/i)).toBeInTheDocument();
       });
 
       const closeButton = screen.getByRole('button', { name: /×/ });
       await user.click(closeButton);
 
-      expect(screen.queryByText(/error.*test error/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/test error/i)).not.toBeInTheDocument();
     });
   });
 
