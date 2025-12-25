@@ -7,6 +7,7 @@ import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import { logger } from './services/logger';
 import { settingsManager } from './services/settings-manager';
+import { databaseManager } from './database/db-manager';
 import { registerIPCHandlers, unregisterIPCHandlers } from './ipc-handlers';
 
 // Keep a global reference to prevent garbage collection
@@ -91,6 +92,15 @@ function createMainWindow(): BrowserWindow {
 app.whenReady().then(() => {
   logger.info('App is ready');
 
+  // Initialize database
+  try {
+    databaseManager.initialize();
+    logger.info('Database initialized successfully');
+  } catch (error) {
+    logger.error('Failed to initialize database', error);
+    // Continue anyway - database will be initialized on first use
+  }
+
   // Register IPC handlers
   registerIPCHandlers();
 
@@ -126,6 +136,14 @@ app.on('window-all-closed', () => {
 app.on('before-quit', () => {
   logger.info('Application quitting');
   unregisterIPCHandlers();
+
+  // Close database connection
+  try {
+    databaseManager.close();
+    logger.info('Database connection closed');
+  } catch (error) {
+    logger.error('Error closing database', error);
+  }
 });
 
 /**

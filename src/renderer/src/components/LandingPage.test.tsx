@@ -4,8 +4,19 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
-import { LandingPage } from './LandingPage';
+import LandingPage from './LandingPage';
+
+// Mock useNavigate
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
 
 describe('LandingPage Component', () => {
   describe('Initial Render', () => {
@@ -119,9 +130,9 @@ describe('LandingPage Component', () => {
       expect(actionButtons.length).toBeGreaterThanOrEqual(3);
     });
 
-    it('should handle action card clicks', async () => {
+    it('should navigate on backlog card click', async () => {
       const user = userEvent.setup();
-      const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      mockNavigate.mockClear();
 
       render(<LandingPage />);
 
@@ -130,15 +141,13 @@ describe('LandingPage Component', () => {
 
       if (backlogButton) {
         await user.click(backlogButton);
-        expect(consoleLogSpy).toHaveBeenCalledWith('Action clicked:', 'backlog');
+        expect(mockNavigate).toHaveBeenCalledWith('/backlog');
       }
-
-      consoleLogSpy.mockRestore();
     });
 
     it('should handle all action card types', async () => {
       const user = userEvent.setup();
-      const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      mockNavigate.mockClear();
 
       render(<LandingPage />);
 
@@ -146,24 +155,26 @@ describe('LandingPage Component', () => {
       const backlogButton = screen.getByText('Generate a backlog').closest('button');
       if (backlogButton) {
         await user.click(backlogButton);
-        expect(consoleLogSpy).toHaveBeenCalledWith('Action clicked:', 'backlog');
+        expect(mockNavigate).toHaveBeenCalledWith('/backlog');
       }
+
+      mockNavigate.mockClear();
 
       // Test project action
       const projectButton = screen.getByText('Start a new project').closest('button');
       if (projectButton) {
         await user.click(projectButton);
-        expect(consoleLogSpy).toHaveBeenCalledWith('Action clicked:', 'project');
+        expect(mockNavigate).toHaveBeenCalledWith('/projects');
       }
+
+      mockNavigate.mockClear();
 
       // Test architecture action
       const architectureButton = screen.getByText('Review architecture').closest('button');
       if (architectureButton) {
         await user.click(architectureButton);
-        expect(consoleLogSpy).toHaveBeenCalledWith('Action clicked:', 'architecture');
+        expect(mockNavigate).toHaveBeenCalledWith('/architecture');
       }
-
-      consoleLogSpy.mockRestore();
     });
   });
 

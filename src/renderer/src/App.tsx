@@ -2,16 +2,12 @@
  * Main App Component
  */
 
-import { MainLayout } from './components/MainLayout';
-import { LandingPage } from './components/LandingPage';
+import { RouterProvider } from 'react-router-dom';
+import { router } from './router';
 import './styles/App.css';
 
 function App() {
-  return (
-    <MainLayout>
-      <LandingPage />
-    </MainLayout>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

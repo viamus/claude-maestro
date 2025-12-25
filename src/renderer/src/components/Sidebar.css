@@ -1,14 +1,29 @@
 /**
  * Sidebar Styles
+ * Futuristic AI-themed design
  */
 
 .sidebar {
   height: 100vh;
-  background-color: #f8f9fa;
-  border-right: 1px solid #dee2e6;
+  background: linear-gradient(180deg, rgba(15, 15, 25, 0.95) 0%, rgba(20, 20, 30, 0.95) 100%);
+  border-right: 1px solid rgba(100, 200, 255, 0.15);
   display: flex;
   flex-direction: column;
-  transition: width 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(180deg, transparent 0%, rgba(100, 200, 255, 0.3) 50%, transparent 100%);
+  opacity: 0.6;
 }
 
 .sidebar-expanded {
@@ -21,7 +36,6 @@
 
 .sidebar-loading {
   width: 240px;
-  background-color: #f8f9fa;
 }
 
 /* Header */
@@ -30,37 +44,52 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 12px;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid rgba(100, 200, 255, 0.1);
   min-height: 60px;
+  position: relative;
+}
+
+.sidebar-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(100, 200, 255, 0.3) 50%, transparent 100%);
 }
 
 .sidebar-logo {
   font-size: 16px;
   font-weight: 600;
   margin: 0;
-  color: #212529;
+  color: #e0e0e0;
   white-space: nowrap;
   overflow: hidden;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .sidebar-toggle {
-  background: none;
-  border: 1px solid #dee2e6;
-  border-radius: 4px;
+  background: rgba(100, 200, 255, 0.05);
+  border: 1px solid rgba(100, 200, 255, 0.2);
+  border-radius: 6px;
   width: 28px;
   height: 28px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  color: #6c757d;
+  font-size: 16px;
+  color: #64c8ff;
   flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sidebar-toggle:hover {
-  background-color: #e9ecef;
-  border-color: #adb5bd;
+  background: rgba(100, 200, 255, 0.15);
+  border-color: #64c8ff;
+  box-shadow: 0 0 15px rgba(100, 200, 255, 0.2);
 }
 
 .sidebar-collapsed .sidebar-toggle {
@@ -72,46 +101,82 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 12px 8px;
+  gap: 6px;
+  padding: 16px 8px;
   overflow-y: auto;
 }
 
 .sidebar-nav-secondary {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 12px 8px;
-  border-top: 1px solid #dee2e6;
+  gap: 6px;
+  padding: 16px 8px;
+  border-top: 1px solid rgba(100, 200, 255, 0.1);
+  position: relative;
+}
+
+.sidebar-nav-secondary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(100, 200, 255, 0.3) 50%, transparent 100%);
 }
 
 .sidebar-nav-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 12px;
-  background: none;
-  border: none;
+  padding: 11px 12px;
+  background: rgba(20, 20, 30, 0.3);
+  border: 1px solid rgba(100, 200, 255, 0.1);
   border-radius: 6px;
   cursor: pointer;
   text-align: left;
-  color: #495057;
-  font-size: 14px;
-  transition: background-color 0.15s ease;
+  color: #a0a0a0;
+  font-size: 0.875rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-nav-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #64c8ff 0%, #4a9eff 100%);
+  transform: scaleY(0);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sidebar-nav-item:hover {
-  background-color: #e9ecef;
+  background: rgba(100, 200, 255, 0.08);
+  border-color: rgba(100, 200, 255, 0.2);
+  color: #c0c0c0;
+  box-shadow: 0 0 15px rgba(100, 200, 255, 0.05);
 }
 
 .sidebar-nav-item-active {
-  background-color: #495057;
-  color: white;
+  background: linear-gradient(135deg, rgba(100, 200, 255, 0.15) 0%, rgba(100, 200, 255, 0.08) 100%);
+  border-color: rgba(100, 200, 255, 0.3);
+  color: #64c8ff;
+  box-shadow: 0 0 20px rgba(100, 200, 255, 0.1);
+}
+
+.sidebar-nav-item-active::before {
+  transform: scaleY(1);
 }
 
 .sidebar-nav-item-active:hover {
-  background-color: #343a40;
+  background: linear-gradient(135deg, rgba(100, 200, 255, 0.2) 0%, rgba(100, 200, 255, 0.12) 100%);
+  border-color: #64c8ff;
+  color: #8dd4ff;
 }
 
 .sidebar-nav-icon {
@@ -121,66 +186,43 @@
   text-align: center;
   color: inherit;
   opacity: 0.9;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-nav-item:hover .sidebar-nav-icon {
+  transform: scale(1.1);
 }
 
 .sidebar-nav-label {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: 0.02em;
 }
 
 .sidebar-collapsed .sidebar-nav-item {
   justify-content: center;
-  padding: 10px 8px;
+  padding: 11px 8px;
 }
 
 .sidebar-collapsed .sidebar-nav-label {
   display: none;
 }
 
-/* Dark theme support (if needed later) */
-@media (prefers-color-scheme: dark) {
-  .sidebar {
-    background-color: #1e1e1e;
-    border-right-color: #3e3e42;
-  }
+/* Scrollbar for sidebar */
+.sidebar-nav-primary::-webkit-scrollbar {
+  width: 6px;
+}
 
-  .sidebar-header {
-    border-bottom-color: #3e3e42;
-  }
+.sidebar-nav-primary::-webkit-scrollbar-track {
+  background: rgba(20, 20, 30, 0.3);
+}
 
-  .sidebar-logo {
-    color: #e0e0e0;
-  }
+.sidebar-nav-primary::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(100, 200, 255, 0.3) 0%, rgba(100, 200, 255, 0.2) 100%);
+  border-radius: 3px;
+}
 
-  .sidebar-toggle {
-    border-color: #3e3e42;
-    color: #a0a0a0;
-  }
-
-  .sidebar-toggle:hover {
-    background-color: #2d2d30;
-    border-color: #505050;
-  }
-
-  .sidebar-nav-item {
-    color: #cccccc;
-  }
-
-  .sidebar-nav-item:hover {
-    background-color: #2d2d30;
-  }
-
-  .sidebar-nav-item-active {
-    background-color: #505050;
-    color: #ffffff;
-  }
-
-  .sidebar-nav-item-active:hover {
-    background-color: #5a5a5a;
-  }
-
-  .sidebar-nav-secondary {
-    border-top-color: #3e3e42;
-  }
+.sidebar-nav-primary::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(100, 200, 255, 0.5) 0%, rgba(100, 200, 255, 0.3) 100%);
 }

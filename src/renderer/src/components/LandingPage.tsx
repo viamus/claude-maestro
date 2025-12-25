@@ -5,6 +5,7 @@
  * Provides orientation, context, and next-step guidance.
  */
 
+import { useNavigate } from 'react-router-dom';
 import './LandingPage.css';
 
 interface ActionCardProps {
@@ -24,10 +25,17 @@ function ActionCard({ icon, title, description, onClick }: ActionCardProps) {
   );
 }
 
-export function LandingPage() {
+export default function LandingPage() {
+  const navigate = useNavigate();
+
   const handleActionClick = (action: string) => {
-    console.log('Action clicked:', action);
-    // Future: Navigate to specific views
+    if (action === 'backlog') {
+      navigate('/backlog');
+    } else if (action === 'project') {
+      navigate('/projects');
+    } else if (action === 'architecture') {
+      navigate('/architecture');
+    }
   };
 
   return (

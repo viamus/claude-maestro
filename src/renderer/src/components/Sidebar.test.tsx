@@ -4,10 +4,24 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import { Sidebar } from './Sidebar';
 import { IPC_CHANNELS } from '@shared/ipc-channels';
 import type { IPCResponse } from '@shared/types';
+
+// Mock useNavigate and useLocation
+const mockNavigate = vi.fn();
+const mockLocation = { pathname: '/' };
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+    useLocation: () => mockLocation,
+  };
+});
 
 describe('Sidebar Component', () => {
   beforeEach(() => {
@@ -168,11 +182,11 @@ describe('Sidebar Component', () => {
   });
 
   describe('Navigation', () => {
-    it('should call onNavigate when nav item is clicked', async () => {
+    it('should call navigate when nav item is clicked', async () => {
       const user = userEvent.setup();
-      const onNavigate = vi.fn();
+      mockNavigate.mockClear();
 
-      render(<Sidebar onNavigate={onNavigate} />);
+      render(<Sidebar />);
 
       await waitFor(() => {
         expect(screen.getByText('Backlog')).toBeInTheDocument();
@@ -181,25 +195,35 @@ describe('Sidebar Component', () => {
       const backlogButton = screen.getByText('Backlog');
       await user.click(backlogButton);
 
-      expect(onNavigate).toHaveBeenCalledWith('/backlog');
+      expect(mockNavigate).toHaveBeenCalledWith('/backlog');
     });
 
     it('should highlight active navigation item', async () => {
-      render(<Sidebar currentPath="/architecture" />);
+      mockLocation.pathname = '/architecture';
+
+      render(<Sidebar />);
 
       await waitFor(() => {
         const architectureButton = screen.getByText('Architecture').closest('button');
         expect(architectureButton).toHaveClass('sidebar-nav-item-active');
       });
+
+      // Reset for other tests
+      mockLocation.pathname = '/';
     });
 
     it('should not highlight non-active items', async () => {
-      render(<Sidebar currentPath="/architecture" />);
+      mockLocation.pathname = '/architecture';
+
+      render(<Sidebar />);
 
       await waitFor(() => {
         const homeButton = screen.getByText('Home').closest('button');
         expect(homeButton).not.toHaveClass('sidebar-nav-item-active');
       });
+
+      // Reset for other tests
+      mockLocation.pathname = '/';
     });
   });
 

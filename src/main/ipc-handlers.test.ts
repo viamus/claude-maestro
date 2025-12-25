@@ -15,6 +15,10 @@ vi.mock('electron', () => ({
   app: {
     getVersion: vi.fn(() => '1.0.0'),
     quit: vi.fn(),
+    getPath: vi.fn((name: string) => {
+      if (name === 'userData') return '/tmp/test-app-data';
+      return '/tmp';
+    }),
   },
 }));
 

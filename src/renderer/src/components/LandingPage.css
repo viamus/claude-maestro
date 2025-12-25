@@ -1,5 +1,6 @@
 /**
  * LandingPage Styles
+ * Futuristic AI-themed design
  */
 
 .landing-page {
@@ -8,6 +9,8 @@
   display: flex;
   justify-content: center;
   padding: 48px 24px;
+  position: relative;
+  z-index: 1;
 }
 
 .landing-content {
@@ -19,29 +22,54 @@
 .welcome-section {
   margin-bottom: 64px;
   text-align: center;
+  position: relative;
+}
+
+.welcome-section::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(100, 200, 255, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.1); }
 }
 
 .welcome-title {
-  font-size: 36px;
-  font-weight: 600;
+  font-size: 2.5rem;
+  font-weight: 500;
   margin: 0 0 16px 0;
-  color: #212529;
+  color: #e0e0e0;
+  letter-spacing: 0.02em;
+  position: relative;
+  z-index: 1;
 }
 
 .welcome-subtitle {
-  font-size: 18px;
+  font-size: 1.125rem;
   line-height: 1.6;
-  color: #6c757d;
+  color: #a0a0a0;
   max-width: 700px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 /* Section Styles */
 .section-title {
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 500;
   margin: 0 0 24px 0;
-  color: #212529;
+  color: #e0e0e0;
+  letter-spacing: 0.02em;
 }
 
 /* Changelog Section */
@@ -50,10 +78,12 @@
 }
 
 .changelog-content {
-  background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(20, 20, 30, 0.6) 0%, rgba(30, 30, 40, 0.4) 100%);
+  border: 1px solid rgba(100, 200, 255, 0.15);
+  border-radius: 12px;
   padding: 32px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
 }
 
 .changelog-header {
@@ -62,24 +92,36 @@
   gap: 16px;
   margin-bottom: 32px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid rgba(100, 200, 255, 0.1);
+  position: relative;
+}
+
+.changelog-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(100, 200, 255, 0.3) 50%, transparent 100%);
 }
 
 .version-badge {
   display: inline-block;
   padding: 6px 12px;
-  background-color: #495057;
-  color: white;
-  border-radius: 4px;
-  font-size: 13px;
+  background: linear-gradient(135deg, rgba(100, 200, 255, 0.2) 0%, rgba(100, 200, 255, 0.1) 100%);
+  color: #64c8ff;
+  border: 1px solid rgba(100, 200, 255, 0.3);
+  border-radius: 6px;
+  font-size: 0.8125rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
 }
 
 .release-date {
-  font-size: 14px;
-  color: #6c757d;
+  font-size: 0.875rem;
+  color: #a0a0a0;
   font-weight: 500;
 }
 
@@ -93,11 +135,11 @@
 
 .changelog-category-title {
   font-weight: 600;
-  color: #495057;
+  color: #64c8ff;
   margin: 0 0 12px 0;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
-  font-size: 13px;
+  letter-spacing: 0.05em;
+  font-size: 0.8125rem;
 }
 
 .changelog-list {
@@ -107,19 +149,24 @@
 }
 
 .changelog-list li {
-  padding: 8px 0 8px 20px;
+  padding: 8px 0 8px 24px;
   position: relative;
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.6;
-  color: #495057;
+  color: #c0c0c0;
 }
 
 .changelog-list li::before {
-  content: '•';
+  content: '';
   position: absolute;
-  left: 0;
-  color: #6c757d;
-  font-weight: bold;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: linear-gradient(135deg, #64c8ff 0%, #4a9eff 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(100, 200, 255, 0.4);
 }
 
 /* Actions Section */
@@ -130,102 +177,78 @@
 .actions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
+  gap: 24px;
 }
 
 .action-card {
-  padding: 24px;
-  border-radius: 8px;
-  background-color: #ffffff;
-  border: 2px solid #dee2e6;
+  padding: 28px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(20, 20, 30, 0.6) 0%, rgba(30, 30, 40, 0.4) 100%);
+  border: 1px solid rgba(100, 200, 255, 0.15);
   cursor: pointer;
   text-align: left;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.action-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(100, 200, 255, 0.08) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.action-card:hover::before {
+  opacity: 1;
 }
 
 .action-card:hover {
-  border-color: #495057;
-  box-shadow: 0 2px 8px rgba(73, 80, 87, 0.15);
+  border-color: rgba(100, 200, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(100, 200, 255, 0.15);
+  transform: translateY(-2px);
 }
 
 .action-card-icon {
   font-size: 36px;
   display: block;
   margin-bottom: 12px;
-  color: #6c757d;
+  color: #64c8ff;
   opacity: 0.9;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 1;
+}
+
+.action-card:hover .action-card-icon {
+  transform: scale(1.1);
+  text-shadow: 0 0 20px rgba(100, 200, 255, 0.5);
 }
 
 .action-card-title {
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   margin: 0 0 8px 0;
-  color: #212529;
+  color: #e0e0e0;
+  position: relative;
+  z-index: 1;
+  letter-spacing: 0.01em;
 }
 
 .action-card-description {
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.5;
-  color: #6c757d;
+  color: #a0a0a0;
   margin: 0;
-}
-
-/* Dark theme support */
-@media (prefers-color-scheme: dark) {
-  .welcome-title,
-  .section-title,
-  .action-card-title {
-    color: #e0e0e0;
-  }
-
-  .welcome-subtitle,
-  .action-card-description {
-    color: #a0a0a0;
-  }
-
-  .changelog-content {
-    background-color: #2d2d30;
-    border-color: #3e3e42;
-  }
-
-  .changelog-header {
-    border-bottom-color: #3e3e42;
-  }
-
-  .version-badge {
-    background-color: #505050;
-  }
-
-  .release-date {
-    color: #a0a0a0;
-  }
-
-  .changelog-category-title {
-    color: #cccccc;
-  }
-
-  .changelog-list li {
-    color: #cccccc;
-  }
-
-  .changelog-list li::before {
-    color: #808080;
-  }
-
-  .action-card {
-    background-color: #1e1e1e;
-    border-color: #3e3e42;
-  }
-
-  .action-card:hover {
-    border-color: #505050;
-    box-shadow: 0 2px 8px rgba(80, 80, 80, 0.2);
-  }
-
-  .action-card-icon {
-    color: #a0a0a0;
-  }
+  position: relative;
+  z-index: 1;
 }

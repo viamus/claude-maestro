@@ -138,6 +138,11 @@ Claude **MUST** create or update `.wiki/` files whenever:
 - **Security**: Never expose Node.js APIs directly to renderer
 - **Validation**: Validate all IPC inputs in handlers
 - **Testing**: Unit tests REQUIRED for all new code (see Testing Requirements below)
+- **TypeScript Strict Mode**: Always check for undefined/null before using values
+  - When using IPC responses, ALWAYS check `response.data` exists before using it
+  - Example: `if (response.success && response.data) { setState(response.data); }`
+  - NEVER assume optional values exist without checking
+  - Run `npm run typecheck` before committing to catch type errors
 
 ### Development Workflow
 
