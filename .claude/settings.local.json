@@ -21,7 +21,8 @@
       "Bash(taskkill:*)",
       "Bash(npm run build:main:*)",
       "Bash(npm rebuild:*)",
-      "Bash(npx electron-rebuild:*)"
+      "Bash(npx electron-rebuild:*)",
+      "Bash(tasklist:*)"
     ]
   }
 }

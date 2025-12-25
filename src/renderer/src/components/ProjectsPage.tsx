@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { IPC_CHANNELS } from '@shared/ipc-channels';
 import type { Project } from '@shared/types';
 import { NewProjectModal } from './NewProjectModal';
+import { EditProjectModal } from './EditProjectModal';
 import './ProjectsPage.css';
 
 export default function ProjectsPage() {
@@ -15,10 +16,13 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [selectedTag, setSelectedTag] = useState<string>('');
+  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
 
   useEffect(() => {
     loadProjects();
+    loadActiveProject();
   }, []);
 
   const loadProjects = async () => {
@@ -36,6 +40,17 @@ export default function ProjectsPage() {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadActiveProject = async () => {
+    try {
+      const response = await window.api.invoke(IPC_CHANNELS.PROJECT_GET_ACTIVE);
+      if (response.success) {
+        setActiveProjectId(response.data);
+      }
+    } catch (err) {
+      console.error('Failed to load active project:', err);
     }
   };
 
@@ -62,13 +77,17 @@ export default function ProjectsPage() {
       const response = await window.api.invoke(IPC_CHANNELS.PROJECT_SET_ACTIVE, id);
 
       if (response.success) {
-        await loadProjects();
+        await loadActiveProject();
       } else {
         alert(`Failed to set active project: ${response.error}`);
       }
     } catch (err) {
       alert(`Error setting active project: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
+  };
+
+  const handleEditProject = (project: Project) => {
+    setEditingProject(project);
   };
 
   // Get all unique tags from all projects
@@ -188,11 +207,19 @@ export default function ProjectsPage() {
                   </td>
                   <td className="project-actions">
                     <button
-                      className="btn-action btn-set-active"
+                      className={`btn-action ${project.id === activeProjectId ? 'btn-active' : 'btn-set-active'}`}
                       onClick={() => handleSetActiveProject(project.id)}
-                      title="Set as active project"
+                      title={project.id === activeProjectId ? 'Currently active project' : 'Set as active project'}
+                      disabled={project.id === activeProjectId}
                     >
-                      Set Active
+                      {project.id === activeProjectId ? 'Active' : 'Set Active'}
+                    </button>
+                    <button
+                      className="btn-action btn-edit"
+                      onClick={() => handleEditProject(project)}
+                      title="Edit project"
+                    >
+                      Edit
                     </button>
                     <button
                       className="btn-action btn-delete"
@@ -212,6 +239,14 @@ export default function ProjectsPage() {
       {showNewProjectModal && (
         <NewProjectModal
           onClose={() => setShowNewProjectModal(false)}
+          onSuccess={loadProjects}
+        />
+      )}
+
+      {editingProject && (
+        <EditProjectModal
+          project={editingProject}
+          onClose={() => setEditingProject(null)}
           onSuccess={loadProjects}
         />
       )}
