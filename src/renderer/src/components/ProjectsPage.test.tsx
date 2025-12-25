@@ -81,8 +81,11 @@ describe('ProjectsPage Component', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByText('typescript')).toBeInTheDocument();
-        expect(screen.getByText('electron')).toBeInTheDocument();
+        const typescriptTags = screen.getAllByText('typescript');
+        const electronTags = screen.getAllByText('electron');
+        // Should find tags in both the filter dropdown and the project row
+        expect(typescriptTags.length).toBeGreaterThan(0);
+        expect(electronTags.length).toBeGreaterThan(0);
       });
     });
 

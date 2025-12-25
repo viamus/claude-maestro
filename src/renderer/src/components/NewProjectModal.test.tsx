@@ -79,9 +79,9 @@ describe('NewProjectModal Component', () => {
     it('should close modal when clicking overlay', async () => {
       const user = userEvent.setup();
 
-      render(<NewProjectModal onClose={mockOnClose} onSuccess={mockOnSuccess} />);
+      const { container } = render(<NewProjectModal onClose={mockOnClose} onSuccess={mockOnSuccess} />);
 
-      const overlay = screen.getByText('Create New Project').parentElement?.parentElement;
+      const overlay = container.querySelector('.modal-overlay');
       if (overlay) {
         await user.click(overlay);
         expect(mockOnClose).toHaveBeenCalledTimes(1);

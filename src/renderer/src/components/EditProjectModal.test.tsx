@@ -314,11 +314,11 @@ describe('EditProjectModal', () => {
     });
 
     it('should close modal when clicking backdrop', () => {
-      render(
+      const { container } = render(
         <EditProjectModal project={mockProject} onClose={mockOnClose} onSuccess={mockOnSuccess} />
       );
 
-      const backdrop = screen.getByText('Edit Project').parentElement?.parentElement;
+      const backdrop = container.querySelector('.modal-overlay');
       if (backdrop) {
         fireEvent.click(backdrop);
       }

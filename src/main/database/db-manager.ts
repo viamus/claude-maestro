@@ -69,10 +69,24 @@ export class DatabaseManager {
    */
   private runSchema(): void {
     try {
-      const schemaPath = path.join(__dirname, 'schema.sql');
+      // Try multiple paths for schema.sql (production build vs dev/test)
+      const possiblePaths = [
+        path.join(__dirname, 'schema.sql'), // Production: dist/main/main/database/schema.sql
+        path.join(process.cwd(), 'src', 'main', 'database', 'schema.sql'), // Test: from project root (FIRST try this)
+        path.join(__dirname, '..', '..', '..', '..', 'src', 'main', 'database', 'schema.sql'), // Test: from node_modules/.vitest
+        path.resolve(process.cwd(), 'src', 'main', 'database', 'schema.sql'), // Absolute from cwd
+      ];
 
-      if (!fs.existsSync(schemaPath)) {
-        throw new Error(`Schema file not found: ${schemaPath}`);
+      let schemaPath: string | null = null;
+      for (const p of possiblePaths) {
+        if (fs.existsSync(p)) {
+          schemaPath = p;
+          break;
+        }
+      }
+
+      if (!schemaPath) {
+        throw new Error(`Schema file not found. Tried paths: ${possiblePaths.map(p => `\n  - ${p}`).join('')}`);
       }
 
       const schema = fs.readFileSync(schemaPath, 'utf-8');
