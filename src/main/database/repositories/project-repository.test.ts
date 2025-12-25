@@ -125,7 +125,7 @@ describe('ProjectRepository', () => {
     });
 
     it('should return all projects ordered by creation date (newest first)', async () => {
-      const project1 = repository.create({
+      repository.create({
         name: 'Project 1',
         tags: [],
         repositories: [],
@@ -134,7 +134,7 @@ describe('ProjectRepository', () => {
       // Wait 50ms to ensure different timestamp even on fast machines
       await new Promise((resolve) => setTimeout(resolve, 50));
 
-      const project2 = repository.create({
+      repository.create({
         name: 'Project 2',
         tags: [],
         repositories: [],
