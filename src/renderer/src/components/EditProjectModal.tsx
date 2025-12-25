@@ -118,11 +118,11 @@ export function EditProjectModal({ project, onClose, onSuccess }: EditProjectMod
   };
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
+    <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Edit Project</h2>
-          <button className="btn-close" onClick={onClose} aria-label="Close">
+          <button className="modal-close" onClick={onClose} aria-label="Close">
             ×
           </button>
         </div>
@@ -169,18 +169,17 @@ export function EditProjectModal({ project, onClose, onSuccess }: EditProjectMod
             {formData.tags.length > 0 && (
               <div className="tags-list">
                 {formData.tags.map((tag, index) => (
-                  <div key={index} className="tag-item">
-                    <span>{tag}</span>
+                  <span key={index} className="tag">
+                    {tag}
                     <button
                       type="button"
                       onClick={() => handleRemoveTag(index)}
                       disabled={isSubmitting}
-                      className="btn-remove"
-                      aria-label={`Remove tag ${tag}`}
+                      aria-label={`Remove ${tag}`}
                     >
                       ×
                     </button>
-                  </div>
+                  </span>
                 ))}
               </div>
             )}
@@ -227,13 +226,13 @@ export function EditProjectModal({ project, onClose, onSuccess }: EditProjectMod
             )}
           </div>
 
-          {errors.submit && <div className="error-message submit-error">{errors.submit}</div>}
+          {errors.submit && <div className="form-error">{errors.submit}</div>}
 
-          <div className="modal-actions">
-            <button type="button" onClick={onClose} disabled={isSubmitting} className="btn-cancel">
+          <div className="form-actions">
+            <button type="button" onClick={onClose} disabled={isSubmitting}>
               Cancel
             </button>
-            <button type="submit" disabled={isSubmitting} className="btn-submit">
+            <button type="submit" disabled={isSubmitting} className="btn-primary">
               {isSubmitting ? 'Updating...' : 'Update Project'}
             </button>
           </div>
