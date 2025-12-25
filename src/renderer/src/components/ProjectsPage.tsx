@@ -31,7 +31,7 @@ export default function ProjectsPage() {
       setError(null);
       const response = await window.api.invoke(IPC_CHANNELS.PROJECT_GET_ALL);
 
-      if (response.success) {
+      if (response.success && response.data) {
         setProjects(response.data);
       } else {
         setError(response.error || 'Failed to load projects');
@@ -46,7 +46,7 @@ export default function ProjectsPage() {
   const loadActiveProject = async () => {
     try {
       const response = await window.api.invoke(IPC_CHANNELS.PROJECT_GET_ACTIVE);
-      if (response.success) {
+      if (response.success && response.data !== undefined) {
         setActiveProjectId(response.data);
       }
     } catch (err) {
