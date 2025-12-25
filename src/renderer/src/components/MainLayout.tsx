@@ -5,28 +5,16 @@
  * This layout is used across all pages in the application.
  */
 
-import { ReactNode, useState } from 'react';
+import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import './MainLayout.css';
 
-interface MainLayoutProps {
-  children: ReactNode;
-}
-
-export function MainLayout({ children }: MainLayoutProps) {
-  const [currentPath, setCurrentPath] = useState('/');
-
-  const handleNavigate = (path: string) => {
-    setCurrentPath(path);
-    // Future: Integrate with router when navigation is implemented
-    console.log('Navigate to:', path);
-  };
-
+export default function MainLayout() {
   return (
     <div className="main-layout">
-      <Sidebar currentPath={currentPath} onNavigate={handleNavigate} />
+      <Sidebar />
       <main className="main-content">
-        {children}
+        <Outlet />
       </main>
     </div>
   );

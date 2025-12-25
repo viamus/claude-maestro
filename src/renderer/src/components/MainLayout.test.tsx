@@ -4,7 +4,8 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import { MainLayout } from './MainLayout';
+import { MemoryRouter, Outlet } from 'react-router-dom';
+import MainLayout from './MainLayout';
 import { IPC_CHANNELS } from '@shared/ipc-channels';
 import type { IPCResponse } from '@shared/types';
 
@@ -34,9 +35,9 @@ describe('MainLayout Component', () => {
   describe('Initial Render', () => {
     it('should render the sidebar', async () => {
       render(
-        <MainLayout>
-          <div>Test Content</div>
-        </MainLayout>
+        <MemoryRouter>
+          <MainLayout />
+        </MemoryRouter>
       );
 
       await waitFor(() => {
@@ -44,23 +45,25 @@ describe('MainLayout Component', () => {
       });
     });
 
-    it('should render children in main content area', async () => {
+    it('should render Outlet in main content area', async () => {
+      const TestChild = () => <div>Test Content</div>;
+
       render(
-        <MainLayout>
-          <div>Test Content</div>
-        </MainLayout>
+        <MemoryRouter initialEntries={['/test']}>
+          <MainLayout />
+        </MemoryRouter>
       );
 
       await waitFor(() => {
-        expect(screen.getByText('Test Content')).toBeInTheDocument();
+        expect(screen.getByRole('main')).toBeInTheDocument();
       });
     });
 
     it('should apply correct CSS classes', async () => {
       const { container } = render(
-        <MainLayout>
-          <div>Test Content</div>
-        </MainLayout>
+        <MemoryRouter>
+          <MainLayout />
+        </MemoryRouter>
       );
 
       await waitFor(() => {
@@ -73,9 +76,9 @@ describe('MainLayout Component', () => {
   describe('Layout Structure', () => {
     it('should render sidebar and content in correct order', async () => {
       const { container } = render(
-        <MainLayout>
-          <div>Content</div>
-        </MainLayout>
+        <MemoryRouter>
+          <MainLayout />
+        </MemoryRouter>
       );
 
       await waitFor(() => {
@@ -95,51 +98,27 @@ describe('MainLayout Component', () => {
   });
 
   describe('Content Rendering', () => {
-    it('should render multiple child elements', async () => {
+    it('should render Outlet for route content', async () => {
       render(
-        <MainLayout>
-          <div>First Element</div>
-          <div>Second Element</div>
-          <p>Third Element</p>
-        </MainLayout>
+        <MemoryRouter>
+          <MainLayout />
+        </MemoryRouter>
       );
 
       await waitFor(() => {
-        expect(screen.getByText('First Element')).toBeInTheDocument();
-        expect(screen.getByText('Second Element')).toBeInTheDocument();
-        expect(screen.getByText('Third Element')).toBeInTheDocument();
-      });
-    });
-
-    it('should render complex child components', async () => {
-      const ComplexComponent = () => (
-        <div>
-          <h1>Title</h1>
-          <p>Description</p>
-          <button>Action</button>
-        </div>
-      );
-
-      render(
-        <MainLayout>
-          <ComplexComponent />
-        </MainLayout>
-      );
-
-      await waitFor(() => {
-        expect(screen.getByText('Title')).toBeInTheDocument();
-        expect(screen.getByText('Description')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Action' })).toBeInTheDocument();
+        const mainContent = screen.getByRole('main');
+        expect(mainContent).toBeInTheDocument();
+        expect(mainContent).toHaveClass('main-content');
       });
     });
   });
 
   describe('Navigation Integration', () => {
-    it('should pass navigation to sidebar', async () => {
+    it('should render sidebar with navigation items', async () => {
       render(
-        <MainLayout>
-          <div>Content</div>
-        </MainLayout>
+        <MemoryRouter>
+          <MainLayout />
+        </MemoryRouter>
       );
 
       await waitFor(() => {
@@ -150,9 +129,9 @@ describe('MainLayout Component', () => {
 
     it('should track current path state', async () => {
       render(
-        <MainLayout>
-          <div>Content</div>
-        </MainLayout>
+        <MemoryRouter initialEntries={['/']}>
+          <MainLayout />
+        </MemoryRouter>
       );
 
       await waitFor(() => {

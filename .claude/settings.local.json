@@ -13,7 +13,15 @@
       "Bash(npm run build:*)",
       "Bash(test:*)",
       "Bash(dir:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(ls:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)",
+      "Bash(npm run build:main:*)",
+      "Bash(npm rebuild:*)",
+      "Bash(npx electron-rebuild:*)"
     ]
   }
 }

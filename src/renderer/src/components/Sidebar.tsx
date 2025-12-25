@@ -6,14 +6,10 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { IPC_CHANNELS } from '@shared/ipc-channels';
 import type { NavItem } from '@shared/types';
 import './Sidebar.css';
-
-interface SidebarProps {
-  onNavigate?: (path: string) => void;
-  currentPath?: string;
-}
 
 const PRIMARY_NAV_ITEMS: NavItem[] = [
   { id: 'home', label: 'Home', icon: '◆', path: '/' },
@@ -29,9 +25,11 @@ const SECONDARY_NAV_ITEMS: NavItem[] = [
   { id: 'about', label: 'About', icon: 'i', path: '/about' },
 ];
 
-export function Sidebar({ onNavigate, currentPath = '/' }: SidebarProps) {
+export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     loadCollapsedState();
@@ -65,9 +63,7 @@ export function Sidebar({ onNavigate, currentPath = '/' }: SidebarProps) {
   };
 
   const handleNavClick = (path: string) => {
-    if (onNavigate) {
-      onNavigate(path);
-    }
+    navigate(path);
   };
 
   if (loading) {
@@ -94,7 +90,7 @@ export function Sidebar({ onNavigate, currentPath = '/' }: SidebarProps) {
         {PRIMARY_NAV_ITEMS.map((item) => (
           <button
             key={item.id}
-            className={`sidebar-nav-item ${currentPath === item.path ? 'sidebar-nav-item-active' : ''}`}
+            className={`sidebar-nav-item ${location.pathname === item.path ? 'sidebar-nav-item-active' : ''}`}
             onClick={() => handleNavClick(item.path)}
             title={collapsed ? item.label : undefined}
           >
@@ -109,7 +105,7 @@ export function Sidebar({ onNavigate, currentPath = '/' }: SidebarProps) {
         {SECONDARY_NAV_ITEMS.map((item) => (
           <button
             key={item.id}
-            className={`sidebar-nav-item ${currentPath === item.path ? 'sidebar-nav-item-active' : ''}`}
+            className={`sidebar-nav-item ${location.pathname === item.path ? 'sidebar-nav-item-active' : ''}`}
             onClick={() => handleNavClick(item.path)}
             title={collapsed ? item.label : undefined}
           >

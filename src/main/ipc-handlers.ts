@@ -4,9 +4,10 @@
  */
 
 import { ipcMain, app } from 'electron';
-import type { IPCResponse, AppVersion, SettingKey, AppSettings } from '@shared/types';
+import type { IPCResponse, AppVersion, SettingKey, AppSettings, Project, ProjectFormData } from '@shared/types';
 import { IPC_CHANNELS } from '@shared/ipc-channels';
 import { settingsManager } from './services/settings-manager';
+import { projectManager } from './services/project-manager';
 import { logger } from './services/logger';
 
 /**
@@ -134,6 +135,128 @@ export function registerIPCHandlers(): void {
     }
   });
 
+  // Project: Create
+  ipcMain.handle(
+    IPC_CHANNELS.PROJECT_CREATE,
+    async (_event, formData: ProjectFormData): Promise<IPCResponse<Project>> => {
+      try {
+        logger.debug(`Creating project: ${formData.name}`);
+        const project = projectManager.createProject(formData);
+        return createSuccessResponse(project);
+      } catch (error) {
+        logger.error('Error creating project', error);
+        return createErrorResponse<Project>(
+          error instanceof Error ? error.message : 'Unknown error'
+        );
+      }
+    }
+  );
+
+  // Project: Get All
+  ipcMain.handle(
+    IPC_CHANNELS.PROJECT_GET_ALL,
+    async (): Promise<IPCResponse<Project[]>> => {
+      try {
+        logger.debug('Getting all projects');
+        const projects = projectManager.getAllProjects();
+        return createSuccessResponse(projects);
+      } catch (error) {
+        logger.error('Error getting all projects', error);
+        return createErrorResponse<Project[]>(
+          error instanceof Error ? error.message : 'Unknown error'
+        );
+      }
+    }
+  );
+
+  // Project: Get By ID
+  ipcMain.handle(
+    IPC_CHANNELS.PROJECT_GET_BY_ID,
+    async (_event, id: string): Promise<IPCResponse<Project | null>> => {
+      try {
+        logger.debug(`Getting project: ${id}`);
+        const project = projectManager.getProjectById(id);
+        return createSuccessResponse(project);
+      } catch (error) {
+        logger.error(`Error getting project ${id}`, error);
+        return createErrorResponse<Project | null>(
+          error instanceof Error ? error.message : 'Unknown error'
+        );
+      }
+    }
+  );
+
+  // Project: Update
+  ipcMain.handle(
+    IPC_CHANNELS.PROJECT_UPDATE,
+    async (
+      _event,
+      payload: { id: string; data: Partial<ProjectFormData> }
+    ): Promise<IPCResponse<Project>> => {
+      try {
+        logger.debug(`Updating project: ${payload.id}`);
+        const project = projectManager.updateProject(payload.id, payload.data);
+        return createSuccessResponse(project);
+      } catch (error) {
+        logger.error(`Error updating project ${payload.id}`, error);
+        return createErrorResponse<Project>(
+          error instanceof Error ? error.message : 'Unknown error'
+        );
+      }
+    }
+  );
+
+  // Project: Delete
+  ipcMain.handle(
+    IPC_CHANNELS.PROJECT_DELETE,
+    async (_event, id: string): Promise<IPCResponse<void>> => {
+      try {
+        logger.debug(`Deleting project: ${id}`);
+        projectManager.deleteProject(id);
+        return createSuccessResponse(undefined);
+      } catch (error) {
+        logger.error(`Error deleting project ${id}`, error);
+        return createErrorResponse<void>(
+          error instanceof Error ? error.message : 'Unknown error'
+        );
+      }
+    }
+  );
+
+  // Project: Get Active
+  ipcMain.handle(
+    IPC_CHANNELS.PROJECT_GET_ACTIVE,
+    async (): Promise<IPCResponse<string | null>> => {
+      try {
+        logger.debug('Getting active project ID');
+        const activeId = projectManager.getActiveProjectId();
+        return createSuccessResponse(activeId);
+      } catch (error) {
+        logger.error('Error getting active project ID', error);
+        return createErrorResponse<string | null>(
+          error instanceof Error ? error.message : 'Unknown error'
+        );
+      }
+    }
+  );
+
+  // Project: Set Active
+  ipcMain.handle(
+    IPC_CHANNELS.PROJECT_SET_ACTIVE,
+    async (_event, id: string | null): Promise<IPCResponse<void>> => {
+      try {
+        logger.debug(`Setting active project: ${id || 'null'}`);
+        projectManager.setActiveProjectId(id);
+        return createSuccessResponse(undefined);
+      } catch (error) {
+        logger.error('Error setting active project', error);
+        return createErrorResponse<void>(
+          error instanceof Error ? error.message : 'Unknown error'
+        );
+      }
+    }
+  );
+
   logger.info('IPC handlers registered successfully');
 }
 
@@ -148,4 +271,11 @@ export function unregisterIPCHandlers(): void {
   ipcMain.removeHandler(IPC_CHANNELS.SETTINGS_GET_ALL);
   ipcMain.removeHandler(IPC_CHANNELS.APP_VERSION);
   ipcMain.removeHandler(IPC_CHANNELS.APP_QUIT);
+  ipcMain.removeHandler(IPC_CHANNELS.PROJECT_CREATE);
+  ipcMain.removeHandler(IPC_CHANNELS.PROJECT_GET_ALL);
+  ipcMain.removeHandler(IPC_CHANNELS.PROJECT_GET_BY_ID);
+  ipcMain.removeHandler(IPC_CHANNELS.PROJECT_UPDATE);
+  ipcMain.removeHandler(IPC_CHANNELS.PROJECT_DELETE);
+  ipcMain.removeHandler(IPC_CHANNELS.PROJECT_GET_ACTIVE);
+  ipcMain.removeHandler(IPC_CHANNELS.PROJECT_SET_ACTIVE);
 }

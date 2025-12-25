@@ -1,0 +1,349 @@
+/**
+ * ProjectsPage Styles
+ * Gray palette design with table layout
+ */
+
+.projects-page {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+}
+
+/* Loading & Error States */
+.projects-loading,
+.projects-error {
+  text-align: center;
+  padding: 3rem;
+  color: #737373;
+  font-size: 0.9375rem;
+}
+
+.projects-error {
+  color: #dc2626;
+}
+
+.projects-error button {
+  margin-top: 1rem;
+}
+
+/* Empty State */
+.projects-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: #fafafa;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+}
+
+.projects-empty p {
+  margin: 0.5rem 0;
+  color: #737373;
+  font-size: 0.9375rem;
+}
+
+.projects-empty p:first-child {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #525252;
+}
+
+.projects-empty button {
+  margin-top: 1.5rem;
+}
+
+/* Table Container */
+.projects-table-container {
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Table Header with Filter and New Project Button */
+.table-header {
+  padding: 0.875rem 1rem;
+  background: #fafafa;
+  border-bottom: 1px solid #e5e5e5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Filter Section */
+.filter-section {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.filter-section label {
+  font-size: 0.8125rem;
+  color: #525252;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.tag-filter-select {
+  padding: 0.4375rem 0.75rem;
+  border: 1px solid #d4d4d4;
+  border-radius: 5px;
+  background: white;
+  color: #2d2d2d;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  min-width: 150px;
+}
+
+.tag-filter-select:hover {
+  border-color: #a3a3a3;
+}
+
+.tag-filter-select:focus {
+  outline: none;
+  border-color: #525252;
+  box-shadow: 0 0 0 2px rgba(82, 82, 82, 0.1);
+}
+
+/* New Project Button */
+.btn-new-project {
+  padding: 0.5rem 1rem;
+  background: #525252;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  white-space: nowrap;
+}
+
+.btn-new-project .icon {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.btn-new-project:hover {
+  background: #404040;
+}
+
+/* Table */
+.projects-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.projects-table thead {
+  background: #525252;
+  color: white;
+}
+
+.projects-table thead th {
+  padding: 0.875rem 1rem;
+  text-align: left;
+  font-weight: 500;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.projects-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.15s;
+}
+
+.projects-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.projects-table tbody tr:hover {
+  background: #fafafa;
+}
+
+.projects-table tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+  color: #525252;
+}
+
+/* Table Columns */
+.project-name {
+  font-weight: 500;
+  color: #2d2d2d;
+  min-width: 200px;
+  font-size: 0.9375rem;
+}
+
+.project-tags {
+  min-width: 200px;
+}
+
+.project-repos {
+  min-width: 250px;
+}
+
+.project-actions {
+  text-align: right;
+  white-space: nowrap;
+  width: 200px;
+}
+
+/* Tags */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.tag {
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  background: #f0f0f0;
+  border: 1px solid #d4d4d4;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  color: #525252;
+  font-weight: 500;
+}
+
+/* Repositories */
+.repos-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.repo-link {
+  color: #525252;
+  text-decoration: none;
+  font-size: 0.8125rem;
+  transition: color 0.15s;
+}
+
+.repo-link:hover {
+  color: #2d2d2d;
+  text-decoration: underline;
+}
+
+/* Empty Cell */
+.empty-cell {
+  color: #a3a3a3;
+  font-style: italic;
+  font-size: 0.8125rem;
+}
+
+/* Action Buttons */
+.btn-action {
+  padding: 0.4375rem 0.875rem;
+  margin-left: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.btn-set-active {
+  background: #525252;
+  color: white;
+}
+
+.btn-set-active:hover {
+  background: #404040;
+}
+
+.btn-delete {
+  background: white;
+  color: #737373;
+  border: 1px solid #d4d4d4;
+}
+
+.btn-delete:hover {
+  background: #dc2626;
+  color: white;
+  border-color: #dc2626;
+}
+
+/* Primary Button (Header) */
+.btn-primary {
+  padding: 0.625rem 1.25rem;
+  background: #525252;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+
+.btn-primary:hover {
+  background: #404040;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .projects-table {
+    font-size: 0.8125rem;
+  }
+
+  .projects-table thead th,
+  .projects-table tbody td {
+    padding: 0.625rem 0.75rem;
+  }
+
+  .project-name {
+    min-width: 150px;
+  }
+
+  .project-tags,
+  .project-repos {
+    min-width: 180px;
+  }
+}
+
+@media (max-width: 768px) {
+  .projects-page {
+    padding: 1rem;
+  }
+
+  .table-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-section {
+    width: 100%;
+  }
+
+  .tag-filter-select {
+    flex: 1;
+  }
+
+  .btn-new-project {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .projects-table-container {
+    overflow-x: auto;
+  }
+
+  .projects-table {
+    min-width: 700px;
+  }
+}
