@@ -1,18 +1,13 @@
 /**
- * ProjectManager Tests
+ * ProjectManager Tests (with mocked repository)
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { DatabaseManager } from '../database/db-manager';
-import { ProjectManager } from './project-manager';
-import type { ProjectFormData } from '@shared/types';
-import * as fs from 'fs';
-import * as path from 'path';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-// Mock electron app
+// Mock electron app BEFORE any imports that use it
 vi.mock('electron', () => ({
   app: {
-    getPath: () => '.test-data-manager',
+    getPath: () => '.test-data-mock',
   },
 }));
 
@@ -25,104 +20,91 @@ vi.mock('./logger', () => ({
   },
 }));
 
+import { ProjectManager } from './project-manager';
+import type { IProjectRepository } from '../database/repositories/i-project-repository';
+import type { Project, ProjectFormData } from '@shared/types';
+
 describe('ProjectManager', () => {
   let projectManager: ProjectManager;
-  const testDataPath = '.test-data-manager';
+  let mockRepository: IProjectRepository;
+  const mockProjects = new Map<string, Project>();
+  let activeProjectId: string | null = null;
 
   beforeEach(() => {
-    // Ensure test data directory exists
-    if (!fs.existsSync(testDataPath)) {
-      fs.mkdirSync(testDataPath, { recursive: true });
-    }
+    // Clear mock data
+    mockProjects.clear();
+    activeProjectId = null;
 
-    // Ensure clean state - reset singleton
-    DatabaseManager.resetInstance();
+    // Create mock repository
+    mockRepository = {
+      create: vi.fn((formData: ProjectFormData): Project => {
+        const project: Project = {
+          id: `mock-id-${Date.now()}-${Math.random()}`,
+          name: formData.name,
+          tags: formData.tags || [],
+          repositories: formData.repositories || [],
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        };
+        mockProjects.set(project.id, project);
+        return project;
+      }),
 
-    // Initialize database manager and clean any existing data
-    const dbManager = DatabaseManager.getInstance();
-    dbManager.initialize();
-    const db = dbManager.getDatabase();
+      findAll: vi.fn((): Project[] => {
+        return Array.from(mockProjects.values()).sort((a, b) => b.createdAt - a.createdAt);
+      }),
 
-    // Clean all data from previous tests
-    db.exec('DELETE FROM project_repositories');
-    db.exec('DELETE FROM project_tags');
-    db.exec('DELETE FROM projects');
-    db.exec("UPDATE app_metadata SET value = 'null' WHERE key = 'active_project_id'");
+      findById: vi.fn((id: string): Project | null => {
+        return mockProjects.get(id) || null;
+      }),
 
-    // Force WAL checkpoint to persist deletes
-    db.pragma('wal_checkpoint(TRUNCATE)');
+      findByName: vi.fn((name: string): Project | null => {
+        const normalizedName = name.toLowerCase();
+        for (const project of mockProjects.values()) {
+          if (project.name.toLowerCase() === normalizedName) {
+            return project;
+          }
+        }
+        return null;
+      }),
 
-    // Close and reset for the test to use fresh
-    dbManager.close();
-    DatabaseManager.resetInstance();
+      update: vi.fn((id: string, formData: Partial<ProjectFormData>): Project => {
+        const existing = mockProjects.get(id);
+        if (!existing) {
+          throw new Error('Project not found');
+        }
 
-    // Create new project manager (will initialize DB on first use)
-    projectManager = new ProjectManager();
-  });
+        const updated: Project = {
+          ...existing,
+          name: formData.name !== undefined ? formData.name : existing.name,
+          tags: formData.tags !== undefined ? formData.tags : existing.tags,
+          repositories:
+            formData.repositories !== undefined ? formData.repositories : existing.repositories,
+          updatedAt: Date.now(),
+        };
 
-  afterEach(() => {
-    // Reset project manager repository FIRST (releases its reference)
-    projectManager.resetRepository();
+        mockProjects.set(id, updated);
+        return updated;
+      }),
 
-    // Clean database data BEFORE closing (but don't delete files - they're locked on Windows)
-    try {
-      const dbManager = DatabaseManager.getInstance();
-      const db = dbManager.getDatabase();
+      delete: vi.fn((id: string): void => {
+        if (!mockProjects.has(id)) {
+          throw new Error('Project not found');
+        }
+        mockProjects.delete(id);
+      }),
 
-      // Force WAL checkpoint to ensure ALL pending writes are committed
-      db.pragma('wal_checkpoint(TRUNCATE)');
+      getActiveProjectId: vi.fn((): string | null => {
+        return activeProjectId;
+      }),
 
-      // Delete in correct order to avoid foreign key constraints
-      db.prepare('DELETE FROM project_repositories').run();
-      db.prepare('DELETE FROM project_tags').run();
-      db.prepare('DELETE FROM projects').run();
-      db.prepare("UPDATE app_metadata SET value = ? WHERE key = ?").run('null', 'active_project_id');
+      setActiveProjectId: vi.fn((id: string | null): void => {
+        activeProjectId = id;
+      }),
+    };
 
-      // Force another checkpoint to flush deletes
-      db.pragma('wal_checkpoint(FULL)');
-
-      // Verify cleanup worked
-      const remaining = db.prepare('SELECT COUNT(*) as count FROM projects').get() as { count: number };
-      if (remaining.count > 0) {
-        console.warn(`⚠️  afterEach cleanup failed - ${remaining.count} projects still remain!`);
-      }
-    } catch (error) {
-      // Database might not be initialized for tests that only check validation
-    }
-
-    // Close database connection
-    try {
-      DatabaseManager.getInstance().close();
-    } catch (error) {
-      // Ignore errors if database wasn't initialized
-    }
-
-    // Reset database instance for next test
-    DatabaseManager.resetInstance();
-  });
-
-  afterAll(() => {
-    // Clean up test data after ALL tests complete
-    try {
-      // Close database first
-      try {
-        DatabaseManager.getInstance().close();
-      } catch (error) {
-        // Ignore
-      }
-
-      // Wait a bit for file handles to release
-      const start = Date.now();
-      while (Date.now() - start < 100) {
-        // Busy wait
-      }
-
-      if (fs.existsSync(testDataPath)) {
-        fs.rmSync(testDataPath, { recursive: true, force: true });
-      }
-    } catch (error) {
-      // Ignore cleanup errors - files will remain in test directory
-    }
+    // Create ProjectManager with mocked repository
+    projectManager = new ProjectManager(mockRepository);
   });
 
   describe('createProject', () => {
@@ -137,8 +119,9 @@ describe('ProjectManager', () => {
 
       expect(project.id).toBeDefined();
       expect(project.name).toBe('Test Project');
-      expect(project.tags.sort()).toEqual(['electron', 'typescript']); // SQLite doesn't guarantee tag order
+      expect(project.tags).toEqual(['typescript', 'electron']);
       expect(project.repositories).toHaveLength(1);
+      expect(mockRepository.create).toHaveBeenCalledWith(formData);
     });
 
     it('should throw error if name is empty', () => {
@@ -180,7 +163,7 @@ describe('ProjectManager', () => {
       };
 
       const formData2: ProjectFormData = {
-        name: 'duplicate check project', // Same name, different case
+        name: 'duplicate check project',
         tags: [],
         repositories: [],
       };
@@ -280,7 +263,11 @@ describe('ProjectManager', () => {
 
     it('should throw error if new name already exists', () => {
       projectManager.createProject({ name: 'Update Conflict A', tags: [], repositories: [] });
-      const project2 = projectManager.createProject({ name: 'Update Conflict B', tags: [], repositories: [] });
+      const project2 = projectManager.createProject({
+        name: 'Update Conflict B',
+        tags: [],
+        repositories: [],
+      });
 
       expect(() => {
         projectManager.updateProject(project2.id, { name: 'Update Conflict A' });

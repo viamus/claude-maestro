@@ -69,24 +69,38 @@ export class DatabaseManager {
    */
   private runSchema(): void {
     try {
+      // Get absolute path to project root first
+      const projectRoot = process.cwd();
+
       // Try multiple paths for schema.sql (production build vs dev/test)
       const possiblePaths = [
-        path.join(__dirname, 'schema.sql'), // Production: dist/main/main/database/schema.sql
-        path.join(process.cwd(), 'src', 'main', 'database', 'schema.sql'), // Test: from project root (FIRST try this)
-        path.join(__dirname, '..', '..', '..', '..', 'src', 'main', 'database', 'schema.sql'), // Test: from node_modules/.vitest
-        path.resolve(process.cwd(), 'src', 'main', 'database', 'schema.sql'), // Absolute from cwd
+        path.normalize(path.resolve(projectRoot, 'src', 'main', 'database', 'schema.sql')), // Test: absolute from cwd (TRY FIRST)
+        path.normalize(path.join(__dirname, 'schema.sql')), // Production: dist/main/main/database/schema.sql
+        path.normalize(path.join(process.cwd(), 'src', 'main', 'database', 'schema.sql')), // Test: from project root
+        path.normalize(path.join(__dirname, '..', '..', '..', '..', 'src', 'main', 'database', 'schema.sql')), // Test: from node_modules/.vitest
+        path.normalize(path.join(__dirname, '..', '..', 'database', 'schema.sql')), // From compiled dist/main/services
       ];
 
       let schemaPath: string | null = null;
+      const existenceChecks: string[] = [];
       for (const p of possiblePaths) {
-        if (fs.existsSync(p)) {
+        // Try to read file stats instead of existsSync (more reliable on Windows)
+        let exists = false;
+        try {
+          fs.statSync(p);
+          exists = true;
+        } catch {
+          exists = false;
+        }
+        existenceChecks.push(`${p} (exists: ${exists})`);
+        if (exists) {
           schemaPath = p;
           break;
         }
       }
 
       if (!schemaPath) {
-        throw new Error(`Schema file not found. Tried paths: ${possiblePaths.map(p => `\n  - ${p}`).join('')}`);
+        throw new Error(`Schema file not found. Tried paths: ${existenceChecks.map(e => `\n  - ${e}`).join('')}`);
       }
 
       const schema = fs.readFileSync(schemaPath, 'utf-8');

@@ -6,23 +6,25 @@
 import type { Project, ProjectFormData, ValidationError } from '@shared/types';
 import { databaseManager } from '../database/db-manager';
 import { ProjectRepository } from '../database/repositories/project-repository';
+import type { IProjectRepository } from '../database/repositories/i-project-repository';
 import { logger } from './logger';
 
 /**
  * ProjectManager - Manages project CRUD operations and business logic
  */
 export class ProjectManager {
-  private repository: ProjectRepository | null = null;
+  private repository: IProjectRepository | null = null;
 
-  constructor() {
-    // Repository will be initialized on first use
+  constructor(repository?: IProjectRepository) {
+    // Allow injecting repository for testing
+    this.repository = repository || null;
   }
 
   /**
    * Get or initialize repository
    * @private
    */
-  private getRepository(): ProjectRepository {
+  private getRepository(): IProjectRepository {
     if (!this.repository) {
       // Initialize database if not already done
       try {

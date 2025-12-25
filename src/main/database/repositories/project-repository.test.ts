@@ -131,8 +131,8 @@ describe('ProjectRepository', () => {
         repositories: [],
       });
 
-      // Wait 2ms to ensure different timestamp
-      await new Promise((resolve) => setTimeout(resolve, 2));
+      // Wait 50ms to ensure different timestamp even on fast machines
+      await new Promise((resolve) => setTimeout(resolve, 50));
 
       const project2 = repository.create({
         name: 'Project 2',
@@ -143,7 +143,9 @@ describe('ProjectRepository', () => {
       const projects = repository.findAll();
 
       expect(projects).toHaveLength(2);
-      // Check names since IDs are random, but order should be Project 2 first
+      // Verify order by comparing timestamps directly
+      expect(projects[0].createdAt).toBeGreaterThan(projects[1].createdAt);
+      // Verify names match expected order
       expect(projects[0].name).toBe('Project 2'); // Newest first
       expect(projects[1].name).toBe('Project 1');
     });
@@ -229,13 +231,14 @@ describe('ProjectRepository', () => {
         repositories: [],
       });
 
-      // Wait 10ms to ensure timestamp difference (faster machines need more time)
-      await new Promise((resolve) => setTimeout(resolve, 10));
+      // Wait 50ms to ensure timestamp difference even on fast machines
+      await new Promise((resolve) => setTimeout(resolve, 50));
 
       const updated = repository.update(created.id, { name: 'New Name' });
 
       expect(updated.name).toBe('New Name');
-      expect(updated.updatedAt).toBeGreaterThanOrEqual(created.updatedAt);
+      // Verify timestamp was updated
+      expect(updated.updatedAt).toBeGreaterThan(created.updatedAt);
     });
 
     it('should update tags', () => {
